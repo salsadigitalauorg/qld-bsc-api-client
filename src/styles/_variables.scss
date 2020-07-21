@@ -1,0 +1,99 @@
+$font-size-base-px: 16px;
+$green: #007eb1;
+$orange: #f8c97c;
+$purple: #dfd1ff;
+$focus: #3A6378;
+$brand-back: #ebecef;
+$input-background: #f6f7f8;
+$border-color: #767676;
+$text-color: #000;
+$breakpoints: (
+  'xs': 0,
+  's': 576px,
+  'm': 768px,
+  'l': 992px,
+  'xl': 1200px,
+  'xxl': 1600px,
+  'xxxl': 2560px
+);
+
+@mixin arrow_icon {
+  background-image: url('../assets/right-arrow.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  width: rem(24px);
+  height: rem(24px);
+  display: inline-block;
+}
+
+// For use with psuedo elements (::before, ::after)
+@mixin arrow_icon_pe($right: false) {
+  content: '';
+  @include arrow_icon;
+  margin-top: -2px;
+  vertical-align: middle;
+
+  @if $right == false {
+    margin-left: 4px;
+  }
+
+  @if $right == true {
+    transform: rotate(180deg);
+    margin-right: 4px;
+  }
+}
+
+@mixin arrow_icon_span {
+  @include arrow_icon;
+  background-position: center bottom;
+}
+
+@mixin underline {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: $green;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+@mixin breakpoint($break) {
+  $breakpoint-value: map-get($breakpoints, $break);
+  @if $breakpoint-value == null {
+    @error '"#{$break}" is not an available breakpoint. (#{map-keys($breakpoints)})';
+  }
+  @media screen and (min-width: $breakpoint-value) {
+    @content;
+  }
+}
+
+@function rem($pxval) {
+  $base: $font-size-base-px;
+  @return ($pxval / $base) * 1rem;
+}
+
+@mixin focus {
+  &:focus {
+    outline: 3px solid $focus;
+    outline-offset: 2px;
+  }
+}
+
+@mixin font {
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+}
+
+@mixin visually_hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+  pointer-events: none;
+}
