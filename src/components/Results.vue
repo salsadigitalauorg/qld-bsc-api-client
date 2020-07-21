@@ -47,7 +47,7 @@ export default {
   &__items {
     box-sizing: border-box;
     border: rem(1px) solid $border-color;
-    padding: rem(30px) rem(20px);
+    padding: rem(22px) rem(20px);
     margin-bottom: rem(16px);
 
     @include breakpoint('m') {

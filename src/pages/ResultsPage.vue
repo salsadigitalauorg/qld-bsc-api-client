@@ -1,6 +1,7 @@
 <template>
-  <div ref="app" class="app">
+  <div ref="app">
     <div v-if="state === 'listing'">
+      <button @click="backToProfile" class="full-view__back">Back</button>
       <div v-if="listingState === 'loading'">
         <p class="find-a-provider__message">Loading...</p>
       </div>
@@ -18,15 +19,13 @@
 </template>
 
 <script>
-/* global jQuery */
-import localDataset from './assets/dataset.json'
+import localDataset from '../assets/dataset.json'
 import axios from 'axios'
-import FormFilter from './components/FormFilter'
-import Results from './components/Results'
-import Pager from './components/Pager'
-import FullView from './components/FullView'
-import Error from './components/Error'
-// import utils from './lib/utils'
+import FormFilter from '../components/FormFilter'
+import Results from '../components/Results'
+import Pager from '../components/Pager'
+import FullView from '../components/FullView'
+import Error from '../components/Error'
 
 // Flags
 const ID_FIELD = 'id'
@@ -34,7 +33,7 @@ const DISPLAY_NAME_FIELD = 'service_interaction_name'
 const FILTER_FIELD = 'status'
 
 export default {
-  name: 'App',
+  name: 'ResultsPage',
   components: {
     FormFilter,
     Results,
@@ -96,6 +95,9 @@ export default {
   },
   methods: {
     async getDataset () {
+      // TODO: Use the profile id to filter results.
+      // const profileId = this.$route.params.profId
+
       if (this.useRemote) {
         const result = await axios(this.remoteUrl)
         return (result.status === 200 && result.data) ? result.data : false
@@ -166,6 +168,9 @@ export default {
     backClick () {
       this.$router.push({ query: {} })
     },
+    backToProfile () {
+      this.$router.push({ path: '/' })
+    },
     filterList (list) {
       const hasFilters = (this.filters.keywords || this.filters.filter1)
       if (hasFilters) {
@@ -215,13 +220,6 @@ export default {
         if (result) {
           this.state = 'full'
           this.selected = result
-          if (typeof jQuery !== 'undefined') {
-            jQuery('.cdr-content-header').hide()
-            this.pageTitle = jQuery('title').text()
-            const tailId = this.pageTitle.indexOf('|')
-            jQuery('title').text(result.displayName + ' ' + this.pageTitle.substr(tailId))
-            jQuery('.block-system-main-block').hide()
-          }
         }
       } else {
         this.state = 'listing'
@@ -232,13 +230,6 @@ export default {
         this.filters.keywords = (query.q) ? decodeURIComponent(query.q) : ''
         this.filters.filter1 = (query[FILTER_FIELD]) ? decodeURIComponent(query[FILTER_FIELD]) : ''
         this.filters.sort = (query.sort) ? query.sort : 'asc'
-        if (typeof jQuery !== 'undefined') {
-          jQuery('.cdr-content-header').show()
-          jQuery('.block-system-main-block').show()
-          if (this.pageTitle) {
-            jQuery('title').text(this.pageTitle)
-          }
-        }
       }
     }
   },
@@ -252,53 +243,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import './styles/variables';
-
-body, button, select, input {
-  @include font;
-}
-
-body {
-  margin: 0;
-}
-
-.app {
-  max-width: rem(1140px);
-  margin: auto;
-  padding: rem(44px) rem(12px);
-  min-height: calc(100vh - (186px + 44px + 117px + 88px));
-}
-
-.top {
-  height: rem(44px);
-  background-color: #003647;
-}
-
-.header {
-  height: rem(117px);
-  background-color: $green;
-
-  &__inner {
-    max-width: rem(1140px);
-    margin: auto;
-    padding: 10px rem(12px) 20px rem(12px);
-
-    img {
-      width: rem(275px);
-      height: rem(50px);
-    }
-
-    .header__title {
-      font-size: rem(26px);
-      color: white;
-    }
-  }
-}
-
-.footer {
-  height: rem(186px);
-  background-color: #0C2E4C;
-}
-</style>

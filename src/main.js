@@ -1,16 +1,22 @@
 import Vue from 'vue'
-import App from './App.vue'
 import VueRouter from 'vue-router'
+
+import Main from './pages/Main.vue'
+import ProfilePage from './pages/ProfilePage.vue'
+import ResultsPage from './pages/ResultsPage.vue'
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter)
 var router = new VueRouter({
-  mode: 'history',
-  routes: []
+  mode: 'hash',
+  routes: [
+    { path: '/', component: ProfilePage },
+    { path: '/results/:profId', name: 'results', component: ResultsPage },
+  ]
 });
 
 new Vue({
   router,
-  render: h => h(App),
+  render: h => h(Main),
 }).$mount('#app')
