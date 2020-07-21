@@ -260,9 +260,44 @@ body, button, select, input {
   @include font;
 }
 
+body {
+  margin: 0;
+}
+
 .app {
-  max-width: 1280px;
+  max-width: rem(1140px);
   margin: auto;
-  padding: 44px
+  padding: rem(44px);
+}
+
+.top {
+  height: rem(44px);
+  background-color: #003647;
+}
+
+.header {
+  height: rem(117px);
+  background-color: #007EB1;
+
+  &__inner {
+    max-width: rem(1140px);
+    margin: auto;
+    padding: 10px 0 20px 0;
+
+    img {
+      width: rem(275px);
+      height: rem(50px);
+    }
+
+    .header__title {
+      font-size: rem(26px);
+      color: white;
+    }
+  }
+}
+
+.footer {
+  height: rem(186px);
+  background-color: #0C2E4C;
 }
 </style>
