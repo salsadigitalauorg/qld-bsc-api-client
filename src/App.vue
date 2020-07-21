@@ -267,7 +267,8 @@ body {
 .app {
   max-width: rem(1140px);
   margin: auto;
-  padding: rem(44px);
+  padding: rem(44px) rem(12px);
+  min-height: calc(100vh - (186px + 44px + 117px + 88px));
 }
 
 .top {
@@ -277,12 +278,12 @@ body {
 
 .header {
   height: rem(117px);
-  background-color: #007EB1;
+  background-color: $green;
 
   &__inner {
     max-width: rem(1140px);
     margin: auto;
-    padding: 10px 0 20px 0;
+    padding: 10px rem(12px) 20px rem(12px);
 
     img {
       width: rem(275px);
