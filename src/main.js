@@ -12,7 +12,7 @@ var router = new VueRouter({
   mode: 'hash',
   routes: [
     { path: '/', component: ProfilePage },
-    { path: '/results/:profId', name: 'results', component: ResultsPage },
+    { path: '/results', name: 'results', component: ResultsPage },
   ]
 });
 

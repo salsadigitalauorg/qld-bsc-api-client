@@ -13,7 +13,7 @@
       <error v-if="listingState === 'error'" @retry="load" />
     </div>
     <div v-if="state === 'full'">
-      <full-view :selected="selected.dataEntry" @back="backClick" />
+      <full-view :selected="selected.dataEntry" @back="backToResults" />
     </div>
   </div>
 </template>
@@ -70,7 +70,7 @@ export default {
           const dataEntry = this.dataset[i]
           const displayName = dataEntry[DISPLAY_NAME_FIELD] || ''
           curatedDataset.push({
-            id: i,
+            id: i.toString(),
             displayName: displayName,
             keywordSearch: displayName.toUpperCase(),
             title: displayName,
@@ -95,9 +95,6 @@ export default {
   },
   methods: {
     async getDataset () {
-      // TODO: Use the profile id to filter results.
-      // const profileId = this.$route.params.profId
-
       if (this.useRemote) {
         const result = await axios(this.remoteUrl)
         return (result.status === 200 && result.data) ? result.data : false
@@ -132,8 +129,15 @@ export default {
       this.filters.keywords = filters.keywords
       this.pager.currentStep = 1
     },
+    getCleanQuery () {
+      const q = JSON.parse(JSON.stringify(this.$route.query))
+      // Strip out filter related
+      const strip_fields = ['q', FILTER_FIELD, 'sort', 'page', 'id']
+      strip_fields.forEach(field => delete q[field])
+      return q
+    },
     filterSubmit (filters) {
-      const query = {}
+      const query = this.getCleanQuery()
       if (filters.keywords && filters.keywords.length > 0) {
         query.q = encodeURIComponent(filters.keywords)
       }
@@ -149,24 +153,24 @@ export default {
       }
     },
     pagerChange (page) {
-      let query = null
+      let query = JSON.parse(JSON.stringify(this.$route.query))
+      delete query['page']
       if (page > 1) {
-        query = { page: page }
-      } else {
-        const q = this.$route.query['page']
-        query = q
+        query['page'] = page
       }
-      this.$router.push({ query: query })
+      this.$router.push({ query })
       this.$nextTick(() => {
         this.$refs['app'].scrollIntoView({ behavior: 'smooth' })
       })
     },
     selectedResult (result) {
       window.scrollTo(0, 0)
-      this.$router.push({ query: { id: result.id } })
+      const query = this.getCleanQuery()
+      query['id'] = result.id
+      this.$router.push({ query })
     },
-    backClick () {
-      this.$router.push({ query: {} })
+    backToResults () {
+      this.$router.push({ query: this.getCleanQuery() })
     },
     backToProfile () {
       this.$router.push({ path: '/' })

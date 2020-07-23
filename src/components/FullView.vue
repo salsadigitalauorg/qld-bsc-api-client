@@ -2,26 +2,16 @@
   <div class="full-view">
     <button @click="back" class="full-view__back">Back</button>
     <h1 class="full-view__title">{{ selected.service_interaction_name }}</h1>
-    <template v-if="selected.long_description">
-      <h2>Description</h2>
-      <p v-html="selected.long_description"></p>
-    </template>
-    <template v-if="selected.who_is_eligible">
-      <h2>Who is eligible</h2>
-      <p v-html="selected.who_is_eligible"></p>
-    </template>
-    <template v-if="selected.how_to">
-      <h2>How to</h2>
-      <p v-html="selected.how_to"></p>
-    </template>
-    <template v-if="selected.more_information_url">
-      <h2>More information</h2>
-      <p v-html="selected.more_information_url"></p>
-    </template>
-    <template v-if="selected.do_it_online_url">
-      <h2>Do it online</h2>
-      <p v-html="selected.do_it_online_url"></p>
-    </template>
+    <div>
+      <div class="fullview__main">
+        <div v-for="(item, idx) in displayFields" :key="idx">
+          <h2>{{ item.title }}</h2>
+          <p v-html="item.html"></p>
+        </div>
+      </div>
+    </div>
+    <div class="fullview__sidebar">
+    </div>
   </div>
 </template>
 
@@ -31,7 +21,31 @@ export default {
   props: {
     selected: Object
   },
+  data () {
+    return {
+      fields: [
+        { title: 'Description', field: 'long_description' },
+        { title: 'Who is eligible?', field: 'who_is_eligible' },
+        { title: 'What you will need', field: 'what_you_will_need' },
+        { title: 'How to', field: 'how_to' },
+        { title: 'Fees', field: 'fees' },
+        { title: 'Do it online', field: 'do_it_online_url' },
+        { title: 'More information', field: 'more_information_url' },
+        { title: 'Form', field: 'form_url' },
+        { title: 'Who do I call?', field: 'who_do_i_call' }
+      ]
+    }
+  },
   computed: {
+    displayFields () {
+      const rendered = []
+      this.fields.forEach(item => {
+        if (this.selected[item.field]) {
+          rendered.push({ title: item.title, html: this.selected[item.field] })
+        }
+      })
+      return rendered
+    }
   },
   methods: {
     back () {
