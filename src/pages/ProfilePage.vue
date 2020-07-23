@@ -1,10 +1,14 @@
 <template>
   <div class="profile">
-    <div class="profile__image">
-      <img v-if="profile === 'youth'" src="../assets/youth.png" alt="" />
-      <img v-if="profile === 'middle'" src="../assets/middle-aged.png" alt="" />
-      <img v-if="profile === 'senior'" src="../assets/senior.png" alt="" />
-      <img v-if="profile === 'custom'" src="../assets/custom.png" alt="" />
+    <div
+      class="profile__image"
+      :class="{
+        'profile__image--youth': (profile === 'youth'),
+        'profile__image--middle': (profile === 'middle'),
+        'profile__image--senior': (profile === 'senior'),
+        'profile__image--custom': (profile === 'custom')
+      }"
+    >
     </div>
     <h1 class="profile__title">Select a profile</h1>
     <div class="filter__input-select-wrapper">
@@ -87,14 +91,26 @@ export default {
   &__image {
     border-radius: 100%;
     overflow: hidden;
-    border: 2px solid $green;
+    border: rem(2px) solid $green;
     width: rem(150px);
     height: rem(150px);
     margin: 0 auto rem(22px);
+    background-size: cover;
 
-    img {
-      width: 150px;
-      height: 150px;
+    &--youth {
+      background-image: url('../assets/youth.png');
+    }
+
+    &--middle {
+      background-image: url('../assets/middle-aged.png');
+    }
+
+    &--senior {
+      background-image: url('../assets/senior.png');
+    }
+
+    &--custom {
+      background-image: url('../assets/custom.png');
     }
   }
 
