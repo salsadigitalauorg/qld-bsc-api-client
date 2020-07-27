@@ -105,7 +105,7 @@ export default {
 
   &__keyword {
     @include breakpoint('m') {
-      width: 50%;
+      width: 75%;
     }
   }
 
