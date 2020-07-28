@@ -3,8 +3,8 @@
     <div
       class="profile__image"
       :class="{
-        'profile__image--youth': (profile === 'youth'),
-        'profile__image--middle': (profile === 'middle'),
+        'profile__image--middle-remote': (profile === 'middle-remote'),
+        'profile__image--middle-regional': (profile === 'middle-regional'),
         'profile__image--senior': (profile === 'senior'),
         'profile__image--custom': (profile === 'custom')
       }"
@@ -14,8 +14,8 @@
     <div class="filter__input-select-wrapper">
       <select class="filter__select-input" v-model="profile" @change="updateForm">
         <option value="">None</option>
-        <option value="youth">Youth</option>
-        <option value="middle">Middle Aged</option>
+        <option value="middle-remote">Middle Aged - Remote</option>
+        <option value="middle-regional">Middle Aged - Regional</option>
         <option value="senior">Senior</option>
         <option value="custom">Custom</option>
       </select>
@@ -26,7 +26,12 @@
       <div v-for="(field, idx) in form" :key="idx">
         <label>
           <span class="profile__form-field-label filter__label">{{ field.label }}</span>
-          <input class="profile__form-field-input filter__input" type="text" v-model="field.value" />
+          <div class="filter__input-select-wrapper">
+            <select class="filter__select-input" v-model="field.value">
+              <option value=""></option>
+              <option v-for="(option, fieldId) in field.options" :value="option" :key="`field-${idx}-${fieldId}`">{{ option }}</option>
+            </select>
+          </div>
         </label>
       </div>
     </div>
@@ -41,19 +46,173 @@ export default {
     return {
       profile: '',
       form: [
-        { label: 'Lifestage', value: '', type: '' , name: 'lifestage' },
-        { label: 'Authentication level', value: '', type: '' , name: 'auth' },
-        { label: 'Location', value: '', type: '' , name: 'loc' },
-        { label: 'Age', value: '', type: '' , name: 'age' },
-        { label: 'Residency status', value: '', type: '' , name: 'residency' },
-        { label: 'Housing', value: '', type: '' , name: 'housing' },
-        { label: 'Card, licenses and permits', value: '', type: '' , name: 'permits' },
-        { label: 'Business sector', value: '', type: '', name: 'sector' }
+        {
+          label: 'Lifestage',
+          value: '',
+          name: 'lifestage',
+          options: [
+            'Student',
+            'Apprentice or trainee',
+            'Senior',
+            'Unemployed or looking for work',
+            'Working',
+            'Queensland Business Owner',
+            'Queensland Employer',
+            'Dependent children',
+            'Person with a disability',
+            'Volunteer',
+            'Aboriginal or Torres Strait Islander',
+            'Carer'
+          ]
+        },
+        {
+          label: 'Authentication level',
+          value: '',
+          name: 'auth',
+          options: [
+            'None',
+            'Level 1',
+            'Level 2',
+            'Level 2.5'
+          ]
+        },
+        {
+          label: 'Location',
+          value: '',
+          name: 'loc',
+          options: [
+            'Regional',
+            'Remote',
+            'SE',
+            'Any'
+          ]
+        },
+        {
+          label: 'Age',
+          value: '',
+          name: 'age',
+          options: [
+            '15 or older',
+            '16 or older',
+            '17 or older',
+            '18 or older',
+            '55 or older',
+            '60 or older',
+            '65 or older'
+          ]
+        },
+        {
+          label: 'Residency status',
+          value: '',
+          name: 'residency',
+          options: [
+            'Queensland Resident',
+            'Australian Citizen',
+            'Holder Permanent Resident Visa',
+            'Holder of a Permanent Protection Visa (Class XA)',
+            'Have a Bridging Visa and have applied for Permanent Protection Visa (class XA)',
+            'Holder of a Temporary Protection Visa (TPV)',
+            'Applied for Permanent Residency',
+            'Have a Bridging Visa and are being processed for Resolution of Status Visa (subclass 851)',
+            'Hold a current New Zealand Passport',
+            'None of the above'
+          ]
+        },
+        {
+          label: 'Housing',
+          value: '',
+          name: 'housing',
+          options: [
+            'Homeowner',
+            'Renter',
+            'Public housing tenant',
+            'Landowner'
+          ]
+        },
+        {
+          label: 'Card, licenses and permits',
+          value: '',
+          name: 'permits',
+          options: [
+            'Commonwealth Health Care Card',
+            'Commonwealth Pensioner Concession Card',
+            'Seniors Card',
+            'Disability Parking Permit',
+            'Department of Veterans’ Affairs (DVA) Gold Card',
+            'Qld drivers licence (any)',
+            'Qld Marine licence',
+            'Qld motorcycle licence',
+            'QLD industry Authority',
+            'Qld Adult proof of age',
+            'QLD vehicle registration',
+            'QLD boat registration',
+            'Assistance animal pass',
+            'Vision Impairment Travel Pass ',
+            'Working with Children card',
+            'Caravan or trailer registration',
+            'Translink access pass',
+            'Go access travel trainer card',
+            'Student special program pass',
+            'Go card (any)',
+            'Medicare',
+            'Electrical work licence'
+          ]
+        },
+        {
+          label: 'Business sector',
+          value: '',
+          name: 'sector',
+          options: [
+            'Farms, fishing and forestry',
+            'Manufacturing',
+            'Retail and wholesale',
+            'Food, beverage and catering',
+            'Tourism',
+            'Healthcare',
+            'Liquor and gaming',
+            'Mining, energy and water',
+            'Building, property and development',
+            'Transport and logistics',
+            'Science and research',
+            'Information and communication technology (ICT)',
+            'Creative industries',
+            'Regulated industries',
+            'Professional and financial services',
+            'Charity or community association'
+          ]
+        }
       ],
       profileForms: {
-        'youth': ['University', '0', 'Brisbane', '19', 'Studying visa', 'Apartment', 'Drivers license', 'None'],
-        'middle': ['Employed', '1', 'Goldcoast', '35', 'Citizen', 'House', 'Drivers license', 'White-collar'],
-        'senior': ['Retired', '2', 'Cairns', '65', 'Permanent Resident', 'House', 'Drivers license', 'None']
+        'middle-remote': [
+          'Working',
+          'Level 1',
+          'Remote',
+          '18 or older',
+          'None of the above',
+          'Renter',
+          'Working with Children card',
+          'Science and research'
+        ],
+        'middle-regional': [
+          'Working',
+          'None',
+          'Regional',
+          '18 or older',
+          'Australian Citizen',
+          'Homeowner',
+          'Medicare',
+          'Transport and logistics'
+        ],
+        'senior': [
+          'Senior',
+          'None',
+          'SE',
+          '60 or older',
+          'Australian Citizen',
+          'Homeowner',
+          'Seniors Card',
+          'Charity or community association'
+        ]
       }
     }
   },
@@ -97,12 +256,12 @@ export default {
     margin: 0 auto rem(22px);
     background-size: cover;
 
-    &--youth {
-      background-image: url('../assets/youth.png');
+    &--middle-remote {
+      background-image: url('../assets/middle-remote.png');
     }
 
-    &--middle {
-      background-image: url('../assets/middle-aged.png');
+    &--middle-regional {
+      background-image: url('../assets/middle-regional.png');
     }
 
     &--senior {

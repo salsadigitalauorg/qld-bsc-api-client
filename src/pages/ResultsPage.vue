@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import localDataset from '../assets/dataset.json'
+import localDataset from '../assets/dataset_blrga.json'
 import axios from 'axios'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
