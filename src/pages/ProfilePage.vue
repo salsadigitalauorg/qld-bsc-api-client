@@ -14,8 +14,8 @@
     <div class="filter__input-select-wrapper">
       <select class="filter__select-input" v-model="profile" @change="updateForm">
         <option value="">None</option>
-        <option value="middle-remote">Middle Aged - Remote</option>
-        <option value="middle-regional">Middle Aged - Regional</option>
+        <option value="middle-remote">Middle Aged - Country</option>
+        <option value="middle-regional">Middle Aged - City</option>
         <option value="senior">Senior</option>
         <option value="custom">Custom</option>
       </select>
