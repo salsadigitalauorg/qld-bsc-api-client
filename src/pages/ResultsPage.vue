@@ -209,7 +209,6 @@ export default {
             break
           }
         }
-        console.log(result)
         if (result) {
           this.state = 'full'
           this.selected = result
