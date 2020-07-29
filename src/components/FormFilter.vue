@@ -2,25 +2,9 @@
   <form class="filter" @submit.prevent="filterSubmit">
     <div class="filter__first-line">
       <div class="filter__field filter__keyword">
-        <label class="filter__label filter__keyword-label" for="filter__keyword">Search by keywords</label>
-        <input class="filter__input filter__keyword-input" id="filter__keyword" v-model="filter.keywords" type="text" placeholder="Search by keywords" @keyup="filterQuickChange" />
+        <label class="filter__label filter__keyword-label" for="filter__keyword">Search service interactions by keywords</label>
+        <input class="filter__input filter__keyword-input" id="filter__keyword" v-model="filter.keywords" type="text" placeholder="Search service interactions by keywords" @keyup="filterQuickChange" />
       </div>
-      <div class="filter__field filter__dropdown filter__provider">
-        <label class="filter__label filter__provider-label" for="filter__provider">Filter by status</label>
-        <div class="filter__input-select-wrapper">
-          <select class="filter__select-input" id="filter__provider" v-model="filter.filter1" @change="filterSubmit">
-            <option value="">All</option>
-            <option v-for="(item, idx) in filterList" :key="idx" :value="item.value">{{ item.label }}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="filter__sort">
-       <label class="filter__label filter__sort-label" for="filter__sort">Sort</label>
-       <select class="filter__sort-input" id="filter__sort" v-model="filter.sort" @change="filterSubmit">
-         <option value="asc">Sort (A-Z)</option>
-         <option value="desc">Sort (Z-A)</option>
-       </select>
     </div>
   </form>
 </template>
@@ -56,12 +40,6 @@ export default {
       if (newVal.keywords) {
         this.filter.keywords = newVal.keywords
       }
-      if (newVal.filter1) {
-        this.filter.filter1 = newVal.filter1
-      }
-      if (newVal.sort) {
-        this.filter.sort = newVal.sort
-      }
     }
   }
 }
@@ -71,7 +49,8 @@ export default {
 @import '../styles/variables';
 
 .filter {
-  margin-bottom: rem(16px);
+  margin-top: rem(22px);
+  margin-bottom: rem(44px);
   max-width: none;
 
   &__first-line {
@@ -105,7 +84,7 @@ export default {
 
   &__keyword {
     @include breakpoint('m') {
-      width: 75%;
+      width: 100%;
     }
   }
 

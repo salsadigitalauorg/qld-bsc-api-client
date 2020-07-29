@@ -6,14 +6,13 @@
         <p class="find-a-provider__message">Loading...</p>
       </div>
       <template v-if="listingState === 'display'">
-        <form-filter :filter-list="filter1List" :initialValues="filters" @filterSubmit="filterSubmit" @filterQuickChange="filterQuickChange" />
-        <results :list="paginatedView" @selected="selectedResult"/>
-        <pager v-if="totalSteps > 1" :initial="pager.currentStep" :perstep="pager.itemsPerStep" :total="totalSteps" @change="pagerChange"/>
+        <form-filter :initialValues="filters" @filterSubmit="filterSubmit" @filterQuickChange="filterQuickChange" />
+        <results :list="serviceList" @selected="selectedResult"/>
       </template>
       <error v-if="listingState === 'error'" @retry="load" />
     </div>
     <div v-if="state === 'full'">
-      <full-view :selected="selected.dataEntry" @back="backToResults" />
+      <full-view :selected="selected" @back="backToResults" />
     </div>
   </div>
 </template>
@@ -23,21 +22,18 @@ import localDataset from '../assets/dataset_blrga.json'
 import axios from 'axios'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
-import Pager from '../components/Pager'
 import FullView from '../components/FullView'
 import Error from '../components/Error'
 
 // Flags
 const ID_FIELD = 'id'
 const DISPLAY_NAME_FIELD = 'service_interaction_name'
-const FILTER_FIELD = 'status'
 
 export default {
   name: 'ResultsPage',
   components: {
     FormFilter,
     Results,
-    Pager,
     FullView,
     Error
   },
@@ -47,14 +43,7 @@ export default {
       useRemote: false,
       dataset: null,
       filters: {
-        keywords: null,
-        filter1: null,
-        sort: 'asc'
-      },
-      filter1List: null,
-      pager: {
-        currentStep: 1,
-        itemsPerStep: 10
+        keywords: null
       },
       state: 'listing',
       listingState: 'loading',
@@ -63,9 +52,50 @@ export default {
     }
   },
   computed: {
+    serviceList () {
+      const groupedList = []
+      if (this.dataset) {
+        const groups = {}
+        this.dataset.forEach(item => {
+          // Get unique services.
+          if (groups[item.service_name] === undefined) {
+            groups[item.service_name] = {
+              title: item.service_name,
+              description: '',
+              serviceInteractions: []
+            }
+          }
+          // Find the description matching the service.
+          if (groups[item.service_name].description === '' && item.service_interaction_name === '') {
+            groups[item.service_name].id = item.agency_service_id.toString()
+            groups[item.service_name].description = item.short_description
+          }
+          // Add service interactions
+          if (item.service_interaction_name !== '') {
+            groups[item.service_name].serviceInteractions.push({
+              id: item.agency_service_id.toString(),
+              title: item.service_interaction_name,
+              description: item.short_description,
+              keywordSearch: item.service_interaction_name.toUpperCase(),
+              dataEntry: item
+            })
+          }
+        })
+        Object.keys(groups).forEach(group => {
+          // Filter & sort interactions.
+          groups[group].serviceInteractions = this.filterList(groups[group].serviceInteractions)
+          this.sortList(groups[group].serviceInteractions, 'title')
+          // Move group into array.
+          groupedList.push(groups[group])
+        })
+      }
+      this.sortList(groupedList, 'title')
+      return groupedList
+    },
     processedList () {
       let curatedDataset = []
       if (this.dataset) {
+        // Get all results
         for (let i = 0; i < this.dataset.length; i++) {
           const dataEntry = this.dataset[i]
           const displayName = dataEntry[DISPLAY_NAME_FIELD] || ''
@@ -73,25 +103,17 @@ export default {
             id: i.toString(),
             displayName: displayName,
             keywordSearch: displayName.toUpperCase(),
+            groupName: dataEntry['service_name'],
             title: displayName,
             description: dataEntry['short_description'],
-            filter1: dataEntry[FILTER_FIELD],
             dataEntry: dataEntry
           })
         }
-        curatedDataset = this.filterList(curatedDataset)
-        this.sortList(curatedDataset)
       }
+      curatedDataset = this.filterList(curatedDataset)
+      this.sortList(curatedDataset, 'displayName')
       return curatedDataset
     },
-    paginatedView () {
-      const from = (this.pager.currentStep - 1) * this.pager.itemsPerStep
-      const to = from + this.pager.itemsPerStep
-      return this.processedList.slice(from, to)
-    },
-    totalSteps () {
-      return Math.ceil(this.processedList.length / this.pager.itemsPerStep)
-    }
   },
   methods: {
     async getDataset () {
@@ -108,12 +130,7 @@ export default {
         const dataset = await this.getDataset()
         if (dataset) {
           this.dataset = dataset
-          // Populate providers
-          const filter1Set = new Set()
-          this.dataset.forEach(item => {
-            filter1Set.add(item[FILTER_FIELD])
-          })
-          this.filter1List = Array.from(filter1Set).map(item => ({ label: item, value: item }))
+
           // Set state
           this.listingState = 'display'
           this.setState(this.$route.query)
@@ -127,12 +144,11 @@ export default {
     },
     filterQuickChange (filters) {
       this.filters.keywords = filters.keywords
-      this.pager.currentStep = 1
     },
     getCleanQuery () {
       const q = JSON.parse(JSON.stringify(this.$route.query))
       // Strip out filter related
-      const strip_fields = ['q', FILTER_FIELD, 'sort', 'page', 'id']
+      const strip_fields = ['q', 'id']
       strip_fields.forEach(field => delete q[field])
       return q
     },
@@ -141,27 +157,10 @@ export default {
       if (filters.keywords && filters.keywords.length > 0) {
         query.q = encodeURIComponent(filters.keywords)
       }
-      if (filters.filter1) {
-        query[FILTER_FIELD] = encodeURIComponent(filters.filter1)
-      }
-      if (filters.sort && filters.sort !== 'asc') {
-        query.sort = filters.sort
-      }
       // Update router if query has changed.
       if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
         this.$router.push({ query: query })
       }
-    },
-    pagerChange (page) {
-      let query = JSON.parse(JSON.stringify(this.$route.query))
-      delete query['page']
-      if (page > 1) {
-        query['page'] = page
-      }
-      this.$router.push({ query })
-      this.$nextTick(() => {
-        this.$refs['app'].scrollIntoView({ behavior: 'smooth' })
-      })
     },
     selectedResult (result) {
       window.scrollTo(0, 0)
@@ -176,20 +175,15 @@ export default {
       this.$router.push({ path: '/' })
     },
     filterList (list) {
-      const hasFilters = (this.filters.keywords || this.filters.filter1)
+      const hasFilters = (this.filters.keywords)
       if (hasFilters) {
         const returnList = []
         const keywords = this.filters.keywords ? this.filters.keywords.toUpperCase() : false
-        const filter1 = this.filters.filter1 ? this.filters.filter1 : false
         list.forEach(item => {
           let tests = []
           // Keyword
           if (keywords) {
             tests.push((item.keywordSearch.indexOf(keywords) > -1))
-          }
-          // Filter 1
-          if (filter1) {
-            tests.push((item.filter1 === filter1))
           }
           const hasPassed = tests.every(pass => pass === true)
           if (hasPassed) {
@@ -201,26 +195,21 @@ export default {
         return list
       }
     },
-    sortList (list) {
-      if (this.filters.sort) {
-        if (this.filters.sort === 'asc') {
-          list = list.sort((a, b) => a.displayName.localeCompare(b.displayName))
-        } else {
-          list = list.sort((a, b) => b.displayName.localeCompare(a.displayName))
-        }
-      }
+    sortList (list, name) {
+      list = list.sort((a, b) => a[name].localeCompare(b[name]))
       return list
     },
     setState (query) {
       if (query[ID_FIELD]) {
         let result = null
-        for (let i = 0; i < this.processedList.length; i++) {
-          const item = this.processedList[i]
-          if (item.id === query[ID_FIELD]) {
+        for (let i = 0; i < this.dataset.length; i++) {
+          const item = this.dataset[i]
+          if (item.agency_service_id.toString() === query[ID_FIELD]) {
             result = item
             break
           }
         }
+        console.log(result)
         if (result) {
           this.state = 'full'
           this.selected = result
@@ -228,12 +217,8 @@ export default {
       } else {
         this.state = 'listing'
         this.selected = null
-        // Pager
-        this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
         // Filter
         this.filters.keywords = (query.q) ? decodeURIComponent(query.q) : ''
-        this.filters.filter1 = (query[FILTER_FIELD]) ? decodeURIComponent(query[FILTER_FIELD]) : ''
-        this.filters.sort = (query.sort) ? query.sort : 'asc'
       }
     }
   },
