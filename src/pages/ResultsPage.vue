@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import localDataset from '../assets/dataset_blrga.json'
+import localDataset from '../assets/dataset_blrgaptss.json'
 import axios from 'axios'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
@@ -56,7 +56,7 @@ export default {
       const groupedList = []
       if (this.dataset) {
         const groups = {}
-        this.dataset.forEach(item => {
+        this.dataset.forEach((item, index) => {
           // Get unique services.
           if (groups[item.service_name] === undefined) {
             groups[item.service_name] = {
@@ -67,13 +67,13 @@ export default {
           }
           // Find the description matching the service.
           if (groups[item.service_name].description === '' && item.service_interaction_name === '') {
-            groups[item.service_name].id = item.agency_service_id.toString()
+            groups[item.service_name].id = index.toString()
             groups[item.service_name].description = item.short_description
           }
           // Add service interactions
           if (item.service_interaction_name !== '') {
             groups[item.service_name].serviceInteractions.push({
-              id: item.agency_service_id.toString(),
+              id: index.toString(),
               title: item.service_interaction_name,
               description: item.short_description,
               keywordSearch: item.service_interaction_name.toUpperCase(),
@@ -204,7 +204,7 @@ export default {
         let result = null
         for (let i = 0; i < this.dataset.length; i++) {
           const item = this.dataset[i]
-          if (item.agency_service_id.toString() === query[ID_FIELD]) {
+          if (i.toString() === query[ID_FIELD]) {
             result = item
             break
           }
