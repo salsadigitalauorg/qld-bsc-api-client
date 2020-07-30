@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import localDataset from '../assets/dataset_blrgaptss.json'
+import localDataset from '../assets/dataset.json'
 import axios from 'axios'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
