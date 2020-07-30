@@ -68,7 +68,7 @@ export default {
           // Find the description matching the service.
           if (groups[item.service_name].description === '' && item.service_interaction_name === '') {
             groups[item.service_name].id = index.toString()
-            groups[item.service_name].description = item.short_description
+            groups[item.service_name].description = item.short_description.replace(/<[/a-z]*>/gi, '').trim()
           }
           // Add service interactions
           if (item.service_interaction_name !== '') {
