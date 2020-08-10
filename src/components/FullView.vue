@@ -3,7 +3,7 @@
     <button @click="back" class="full-view__back">Back</button>
     <div class="full-view__body">
       <div class="full-view__main">
-        <h1 class="full-view__title">{{ selected.service_interaction_name }}</h1>
+        <h1 class="full-view__title">{{ selected.name }}</h1>
         <div v-for="(item, idx) in displayFields" :key="'body-' + idx">
           <h2>{{ item.title }}</h2>
           <p v-html="item.html"></p>
@@ -35,7 +35,7 @@ export default {
       fields: [
         { title: 'Description', field: 'long_description' },
         { title: 'Who is eligible?', field: 'who_is_eligible' },
-        { title: 'What you will need', field: 'what_you_will_need' },
+        { title: 'What you will need', field: 'prerequisites' },
         { title: 'How to', field: 'how_to' },
         { title: 'Fees', field: 'fees', type: 'url'},
         { title: 'Do it online', field: 'do_it_online_url', type: 'url'},

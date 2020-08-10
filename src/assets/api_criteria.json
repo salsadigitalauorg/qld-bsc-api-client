@@ -1,0 +1,212 @@
+{
+  "criteria_age": [
+    {
+      "id": 3,
+      "name": "15 or older"
+    },
+    {
+      "id": 4,
+      "name": "16 or older"
+    },
+    {
+      "id": 5,
+      "name": "17 or older"
+    },
+    {
+      "id": 6,
+      "name": "18 or older"
+    },
+    {
+      "id": 7,
+      "name": "55 or older"
+    },
+    {
+      "id": 8,
+      "name": "60 or older"
+    },
+    {
+      "id": 9,
+      "name": "65 or older"
+    }
+  ],
+  "criteria_authentication_level": [
+    {
+      "id": 10,
+      "name": "None"
+    },
+    {
+      "id": 11,
+      "name": "Level 1"
+    },
+    {
+      "id": 12,
+      "name": "Level 2"
+    },
+    {
+      "id": 13,
+      "name": "Level 2.5"
+    }
+  ],
+  "criteria_business_sector": [
+    {
+      "id": 14,
+      "name": "Farms, fishing and forestry"
+    },
+    {
+      "id": 15,
+      "name": "Manufacturing"
+    },
+    {
+      "id": 16,
+      "name": "Retail and wholesale"
+    },
+    {
+      "id": 17,
+      "name": "Food, beverage and catering"
+    },
+    {
+      "id": 18,
+      "name": "Tourism"
+    },
+    {
+      "id": 19,
+      "name": "Healthcare"
+    },
+    {
+      "id": 20,
+      "name": "Liquor and gaming"
+    },
+    {
+      "id": 21,
+      "name": "Mining, energy and water"
+    },
+    {
+      "id": 22,
+      "name": "Building, property and development"
+    },
+    {
+      "id": 23,
+      "name": "Transport and logistics"
+    },
+    {
+      "id": 24,
+      "name": "Science and research"
+    },
+    {
+      "id": 25,
+      "name": "Information and communication technology (ICT)"
+    },
+    {
+      "id": 26,
+      "name": "Creative industries"
+    },
+    {
+      "id": 27,
+      "name": "Regulated industries"
+    },
+    {
+      "id": 28,
+      "name": "Professional and financial services"
+    },
+    {
+      "id": 29,
+      "name": "Charity or community association"
+    }
+  ],
+  "criteria_card_licences_permits": [
+    {
+      "id": 30,
+      "name": "Commonwealth Health Care Card"
+    },
+    {
+      "id": 31,
+      "name": "Commonwealth Pensioner Concession Card"
+    },
+    {
+      "id": 32,
+      "name": "Seniors Card"
+    },
+    {
+      "id": 33,
+      "name": "Disability Parking Permit"
+    },
+    {
+      "id": 34,
+      "name": "Department of Veterans' Affairs (DVA) Gold Card"
+    },
+    {
+      "id": 35,
+      "name": "QLD drivers licence (any)"
+    },
+    {
+      "id": 36,
+      "name": "QLD Marine licence"
+    },
+    {
+      "id": 37,
+      "name": "QLD motorcycle licence"
+    },
+    {
+      "id": 38,
+      "name": "QLD industry Authority"
+    },
+    {
+      "id": 39,
+      "name": "QLD Adult proof of age"
+    },
+    {
+      "id": 40,
+      "name": "QLD vehicle registration"
+    },
+    {
+      "id": 41,
+      "name": "QLD boat registration"
+    },
+    {
+      "id": 42,
+      "name": "Assistance animal pass"
+    },
+    {
+      "id": 43,
+      "name": "Vision Impairment Travel Pass"
+    },
+    {
+      "id": 44,
+      "name": "Working with Children card"
+    },
+    {
+      "id": 45,
+      "name": "Caravan or trailer registration"
+    },
+    {
+      "id": 46,
+      "name": "Translink access pass"
+    },
+    {
+      "id": 47,
+      "name": "Go access travel trainer card"
+    },
+    {
+      "id": 48,
+      "name": "Student special program pass"
+    },
+    {
+      "id": 49,
+      "name": "Go card (any)"
+    },
+    {
+      "id": 50,
+      "name": "Medicare"
+    },
+    {
+      "id": 51,
+      "name": "Electrical work licence"
+    }
+  ],
+  "criteria_housing": [
+    {
+      "id": 52,
+      "name": "Homeowner"
+    }
+  ]
+}

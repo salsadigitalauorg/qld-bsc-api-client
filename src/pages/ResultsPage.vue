@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import localDataset from '../assets/dataset.json'
-import axios from 'axios'
+import localServicesData from '../assets/api_services.json'
+import api from '../libs/api'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
 import FullView from '../components/FullView'
@@ -27,7 +27,6 @@ import Error from '../components/Error'
 
 // Flags
 const ID_FIELD = 'id'
-const DISPLAY_NAME_FIELD = 'service_interaction_name'
 
 export default {
   name: 'ResultsPage',
@@ -39,7 +38,6 @@ export default {
   },
   data () {
     return {
-      remoteUrl: '',
       useRemote: false,
       dataset: null,
       filters: {
@@ -55,79 +53,31 @@ export default {
     serviceList () {
       const groupedList = []
       if (this.dataset) {
-        const groups = {}
-        this.dataset.forEach((item, index) => {
-          // Get unique services.
-          if (groups[item.service_name] === undefined) {
-            groups[item.service_name] = {
-              title: item.service_name,
-              description: '',
-              serviceInteractions: []
-            }
-          }
-          // Find the description matching the service.
-          if (groups[item.service_name].description === '' && item.service_interaction_name === '') {
-            groups[item.service_name].id = index.toString()
-            groups[item.service_name].description = item.short_description.replace(/<[/a-z]*>/gi, '').trim()
-          }
-          // Add service interactions
-          if (item.service_interaction_name !== '') {
-            groups[item.service_name].serviceInteractions.push({
-              id: index.toString(),
-              title: item.service_interaction_name,
-              description: item.short_description,
-              keywordSearch: item.service_interaction_name.toUpperCase(),
-              dataEntry: item
-            })
-          }
-        })
+        // Get service groups.
+        const groups = api.getServiceGroups(this.dataset)
         Object.keys(groups).forEach(group => {
-          // Filter & sort interactions.
           groups[group].serviceInteractions = this.filterList(groups[group].serviceInteractions)
           this.sortList(groups[group].serviceInteractions, 'title')
-          // Move group into array.
           groupedList.push(groups[group])
         })
       }
       this.sortList(groupedList, 'title')
       return groupedList
-    },
-    processedList () {
-      let curatedDataset = []
-      if (this.dataset) {
-        // Get all results
-        for (let i = 0; i < this.dataset.length; i++) {
-          const dataEntry = this.dataset[i]
-          const displayName = dataEntry[DISPLAY_NAME_FIELD] || ''
-          curatedDataset.push({
-            id: i.toString(),
-            displayName: displayName,
-            keywordSearch: displayName.toUpperCase(),
-            groupName: dataEntry['service_name'],
-            title: displayName,
-            description: dataEntry['short_description'],
-            dataEntry: dataEntry
-          })
-        }
-      }
-      curatedDataset = this.filterList(curatedDataset)
-      this.sortList(curatedDataset, 'displayName')
-      return curatedDataset
-    },
+    }
   },
   methods: {
-    async getDataset () {
+    async loadDataset () {
       if (this.useRemote) {
-        const result = await axios(this.remoteUrl)
-        return (result.status === 200 && result.data) ? result.data : false
+        const result = await api.getServices()
+        return result
       } else {
-        return localDataset
+        return localServicesData
       }
     },
     async load () {
       try {
         this.listingState = 'loading'
-        const dataset = await this.getDataset()
+        const dataset = await this.loadDataset()
         if (dataset) {
           this.dataset = dataset
 
@@ -202,9 +152,10 @@ export default {
     setState (query) {
       if (query[ID_FIELD]) {
         let result = null
-        for (let i = 0; i < this.dataset.length; i++) {
-          const item = this.dataset[i]
-          if (i.toString() === query[ID_FIELD]) {
+        // Find query string service and set as selected.
+        for (let i = 0; i < this.dataset.services.length; i++) {
+          const item = this.dataset.services[i]
+          if (item.id === query[ID_FIELD]) {
             result = item
             break
           }
