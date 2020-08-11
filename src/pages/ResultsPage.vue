@@ -10,6 +10,9 @@
         <results :list="serviceList" @selected="selectedResult"/>
       </template>
       <error v-if="listingState === 'error'" @retry="load" />
+      <div v-if="listingState === 'no-results'">
+        <p class="find-a-provider__message">No results were returned.</p>
+      </div>
     </div>
     <div v-if="state === 'full'">
       <full-view :selected="selected" @back="backToResults" />
@@ -18,7 +21,6 @@
 </template>
 
 <script>
-import localServicesData from '../assets/api_services.json'
 import api from '../libs/api'
 import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
@@ -38,7 +40,7 @@ export default {
   },
   data () {
     return {
-      useRemote: false,
+      filterCriteria: [],
       dataset: null,
       filters: {
         keywords: null
@@ -67,12 +69,23 @@ export default {
   },
   methods: {
     async loadDataset () {
-      if (this.useRemote) {
-        const result = await api.getServices()
-        return result
-      } else {
-        return localServicesData
-      }
+      // Covert profile criteria into filters.
+      const query = this.$route.query
+      const filters = []
+      Object.keys(query).forEach(key => {
+        if (key !== 'id' && key !== 'q') {
+          const val = query[key]
+          if (val) {
+            const field = api.getCriteriaFromQuery(key)
+            filters.push({
+              field: field.fieldName,
+              value: val
+            })
+          }
+        }
+      })
+      const result = await api.loadServices(filters)
+      return result
     },
     async load () {
       try {
@@ -85,7 +98,7 @@ export default {
           this.listingState = 'display'
           this.setState(this.$route.query)
         } else {
-          this.listingState = 'error'
+          this.listingState = 'no-results'
         }
       } catch (e) {
         console.log(e)
@@ -115,7 +128,7 @@ export default {
     selectedResult (result) {
       window.scrollTo(0, 0)
       const query = this.getCleanQuery()
-      query['id'] = result.id
+      query[ID_FIELD] = result.id
       this.$router.push({ query })
     },
     backToResults () {
@@ -152,10 +165,11 @@ export default {
     setState (query) {
       if (query[ID_FIELD]) {
         let result = null
+        const navigateToId = query[ID_FIELD].toString()
         // Find query string service and set as selected.
         for (let i = 0; i < this.dataset.services.length; i++) {
           const item = this.dataset.services[i]
-          if (item.id === query[ID_FIELD]) {
+          if (item.id.toString() === navigateToId) {
             result = item
             break
           }
@@ -163,6 +177,8 @@ export default {
         if (result) {
           this.state = 'full'
           this.selected = result
+        } else {
+          console.log("Could not find result")
         }
       } else {
         this.state = 'listing'

@@ -2,25 +2,96 @@ const axios = require('axios')
 
 const domain = 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
 
-async function loadCriteria () {
-  let result = false
+const criteriaFields = {
+  criteria_age: {
+    label: 'Age',
+    queryName: 'age',
+    fieldName: 'f_criteria_age'
+  },
+  criteria_authentication_level: {
+    label: 'Authentication level',
+    queryName: 'auth',
+    fieldName: 'f_criteria_authentication_level'
+  },
+  criteria_business_sector: {
+    label: 'Business sector',
+    queryName: 'sector',
+    fieldName: 'f_criteria_business_sector'
+  },
+  criteria_card_licences_permits: {
+    label: 'Card, licenses and permits',
+    queryName: 'permits',
+    fieldName: 'f_criteria_card_licences_permits'
+  },
+  criteria_housing: {
+    label: 'Housing',
+    queryName: 'housing',
+    fieldName: 'f_criteria_housing'
+  },
+  criteria_lifestage: {
+    label: 'Lifestage',
+    queryName: 'lifestage',
+    fieldName: 'f_criteria_lifestage'
+  },
+  criteria_location: {
+    label: 'Location',
+    queryName: 'loc',
+    fieldName: 'f_criteria_location'
+  },
+  criteria_residency_status: {
+    label: 'Residency status',
+    queryName: 'residency',
+    fieldName: 'f_criteria_residency_status'
+  }
+}
 
+function buildUrl (domain, filters) {
+  let queries = []
+
+  queries.push(`include=f_agency`)
+
+  filters.forEach(filter => {
+    if (filter.value && filter.value !== '') {
+      queries.push(`filter[${filter.field}.drupal_internal__tid][value]=${filter.value}`)
+    }
+  })
+
+  return `${domain}api/v1/services?${queries.join('&')}`
+}
+
+async function request (url) {
   try {
-    result = await axios({
+    const result = await axios({
       method: 'get',
-      url: `${domain}api/v1/eligibility_criteria`,
+      url: url,
       auth: {
         username: 'bsc',
         password: 'bsc2020'
       }
     })
+    return result
   } catch (e) {
     console.log(e)
+    return false
   }
+}
 
-  if (result && result.data && result.data.data && result.data.data.length > 0) {
+async function recursiveRequest (url) {
+  const result = await request(url)
+  if (result.data && result.data.links && result.data.links.next && result.data.links.next.href) {
+    const next = await recursiveRequest(result.data.links.next.href)
+    return [...result.data.data, ...next]
+  } else {
+    return result.data.data
+  }
+}
+
+async function loadCriteria () {
+  const result = await recursiveRequest(`${domain}api/v1/eligibility_criteria`)
+
+  if (result && result.length > 0) {
     const criteria = {}
-    result.data.data.forEach(item => {
+    result.forEach(item => {
       const type = item.type.replace('taxonomy_term--', '')
       if (criteria[type] === undefined) {
         criteria[type] = []
@@ -35,21 +106,8 @@ async function loadCriteria () {
   return false
 }
 
-async function loadServices () {
-  let result = false
-
-  try {
-    result = await axios({
-      method: 'get',
-      url: `${domain}api/v1/services?include=f_agency`,
-      auth: {
-        username: 'bsc',
-        password: 'bsc2020'
-      }
-    })
-  } catch (e) {
-    console.log(e)
-  }
+async function loadServices (filters) {
+  const result = await request(buildUrl(domain, filters))
 
   if (result && result.data && result.data.data && result.data.data.length > 0) {
     const services = {}
@@ -132,34 +190,74 @@ async function loadServices () {
 
 function getServiceGroups (dataset) {
   const groups = {}
-  dataset.index.service.forEach(serviceIndex => {
-    const service = dataset.services[serviceIndex]
-    // Service Interactions
-    const serviceInteractions = []
-    dataset.index.service_interaction.forEach(interactionIndex => {
-      const interaction = dataset.services[interactionIndex]
-      if (interaction.service_id === service.id) {
-        serviceInteractions.push({
-          id: interaction.id,
-          title: interaction.name,
-          description: interaction.short_description,
-          keywordSearch: interaction.name.toUpperCase()
-        })
+  const groupNameById = {}
+
+  // Create parent service groups
+  if (dataset.index.service) {
+    dataset.index.service.forEach(serviceIndex => {
+      const service = dataset.services[serviceIndex]
+      groupNameById[service.id] = service.name
+      groups[service.name] = {
+        id: service.id,
+        title: service.name,
+        description: service.short_description
       }
     })
-    // Service
-    groups[service.name] = {
-      id: service.id,
-      title: service.name,
-      description: service.short_description,
-      serviceInteractions: serviceInteractions
-    }
-  })
+  }
+
+  // Add child service interactions
+  if (dataset.index.service_interaction) {
+    dataset.index.service_interaction.forEach(interactionIndex => {
+      const interaction = dataset.services[interactionIndex]
+      const interactionResult = {
+        id: interaction.id,
+        title: interaction.name,
+        description: interaction.short_description,
+        keywordSearch: interaction.name.toUpperCase()
+      }
+      let addToGroup = groupNameById[interaction.service_id]
+
+      // If group not found, add to an unsorted bucket.
+      if (addToGroup === undefined) {
+        addToGroup = 'unsorted'
+        if (!groups[addToGroup]) {
+          groups[addToGroup] = {
+            id: -1,
+            title: 'Interactions with no service'
+          }
+        }
+      }
+
+      if (addToGroup) {
+        if (!groups[addToGroup]['serviceInteractions']) {
+          groups[addToGroup]['serviceInteractions'] = []
+        }
+        groups[addToGroup]['serviceInteractions'].push(interactionResult)
+      }
+    })
+  }
+
   return groups
+}
+
+function getCriteriaFields () {
+  return criteriaFields
+}
+
+function getCriteriaFromQuery (query) {
+  const criteria = Object.keys(criteriaFields)
+  for (var i = 0; i < criteria.length; i++) {
+    const key = criteria[i]
+    if (criteriaFields[key].queryName === query) {
+      return criteriaFields[key]
+    }
+  }
 }
 
 module.exports = {
   loadCriteria,
   loadServices,
-  getServiceGroups
+  getServiceGroups,
+  getCriteriaFields,
+  getCriteriaFromQuery
 }

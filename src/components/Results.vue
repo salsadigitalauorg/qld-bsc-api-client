@@ -13,11 +13,13 @@
           </button>
         </h3>
         <div v-if="expanded[index]">
-          <h4>Service</h4>
-          <div class="result__sub-paragraph">
-            <p>{{ item.description }}</p>
-            <button @click="selected(item)" class="result__subitem-field-title-button">Read more about {{ item.title.toLowerCase() }}</button>
-          </div>
+          <template v-if="item.id >= 0">
+            <h4>Service</h4>
+            <div class="result__sub-paragraph">
+              <p>{{ item.description }}</p>
+              <button @click="selected(item)" class="result__subitem-field-title-button">Read more about {{ item.title.toLowerCase() }}</button>
+            </div>
+          </template>
           <h4>Service interactions</h4>
           <p v-if="item.serviceInteractions.length === 0" class="result__sub-paragraph">No service interactions available.</p>
           <ol v-else class="result__subitems">
