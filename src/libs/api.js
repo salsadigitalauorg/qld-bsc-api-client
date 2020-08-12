@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const domain = 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
+const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
 
 const criteriaFields = {
   criteria_age: {
