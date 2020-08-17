@@ -131,7 +131,7 @@ async function loadServices (filters) {
         name: attrs.title,
         agency_service_id: attrs.f_agency_service_id ? attrs.f_agency_service_id : '',
         do_it_online_url: attrs.f_do_it_online_url ? attrs.f_do_it_online_url.uri : '',
-        fees: attrs.f_fees ? attrs.f_fees : '',
+        fees: attrs.f_fees ? attrs.f_fees.processed : '',
         form_url: attrs.f_form_url ? attrs.f_form_url.uri : '',
         how_to: attrs.f_how_to ? attrs.f_how_to.processed : '',
         in_person: attrs.f_in_person ? attrs.f_in_person : '',
