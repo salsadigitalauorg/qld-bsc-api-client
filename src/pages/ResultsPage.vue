@@ -1,79 +1,59 @@
 <template>
   <div ref="app">
-    <div v-if="state === 'listing'">
-      <button @click="backToProfile" class="full-view__back">Back</button>
-      <div v-if="listingState === 'loading'">
-        <p class="find-a-provider__message">Loading...</p>
-      </div>
-      <template v-if="listingState === 'display'">
-        <form-filter :initialValues="filters" @filterSubmit="filterSubmit" @filterQuickChange="filterQuickChange" />
-        <results :list="serviceList" @selected="selectedResult"/>
-      </template>
-      <error v-if="listingState === 'error'" @retry="load" />
-      <div v-if="listingState === 'no-results'">
-        <p class="find-a-provider__message">No results were returned.</p>
-      </div>
+    <button @click="backToProfile" class="full-view__back">Back</button>
+    <div v-if="listingState === 'loading'">
+      <p class="find-a-provider__message">Loading...</p>
     </div>
-    <div v-if="state === 'full'">
-      <full-view :selected="selected" @back="backToResults" />
+    <template v-if="listingState === 'display'">
+      <results :list="this.dataset.services" @selected="selectedResult"/>
+      <pager v-if="totalSteps > 1" :initial="pager.currentStep" :perstep="pager.itemsPerStep" :total="totalSteps" @change="pagerChange"/>
+    </template>
+    <error v-if="listingState === 'error'" @retry="load" />
+    <div v-if="listingState === 'no-results'">
+      <p class="find-a-provider__message">No results were returned.</p>
     </div>
   </div>
 </template>
 
 <script>
 import api from '../libs/api'
-import FormFilter from '../components/FormFilter'
 import Results from '../components/Results'
-import FullView from '../components/FullView'
+import Pager from '../components/Pager'
 import Error from '../components/Error'
-
-// Flags
-const ID_FIELD = 'id'
 
 export default {
   name: 'ResultsPage',
   components: {
-    FormFilter,
     Results,
-    FullView,
+    Pager,
     Error
   },
   data () {
     return {
-      filterCriteria: [],
       dataset: null,
-      filters: {
-        keywords: null
-      },
       state: 'listing',
       listingState: 'loading',
       selected: null,
-      pageTitle: null
+      pageTitle: null,
+      pager: {
+        currentStep: 1,
+        itemsPerStep: 10,
+        totalCount: 1
+      }
     }
   },
   computed: {
-    serviceList () {
-      const groupedList = []
-      if (this.dataset) {
-        // Get service groups.
-        const groups = api.getServiceGroups(this.dataset)
-        Object.keys(groups).forEach(group => {
-          groups[group].serviceInteractions = this.filterList(groups[group].serviceInteractions)
-          this.sortList(groups[group].serviceInteractions, 'title')
-          groupedList.push(groups[group])
-        })
-      }
-      this.sortList(groupedList, 'title')
-      return groupedList
+    totalSteps () {
+      return Math.ceil(this.dataset.totalCount / this.pager.itemsPerStep)
     }
   },
   methods: {
-    async loadDataset () {
+    getAPIFilters () {
       // Covert profile criteria into filters.
       const query = this.$route.query
       const filters = []
       Object.keys(query).forEach(key => {
-        if (key !== 'id' && key !== 'q') {
+        if (key !== 'page') {
           const val = query[key]
           if (val) {
             const field = api.getCriteriaFromQuery(key)
@@ -84,6 +64,17 @@ export default {
           }
         }
       })
+      // Pager size
+      filters.push({ page: `limit`, value: this.pager.itemsPerStep })
+      // Pager offset
+      const offset = (this.pager.currentStep - 1) * this.pager.itemsPerStep
+      if (offset > 0) {
+        filters.push({ page: `offset`, value: offset })
+      }
+      return filters
+    },
+    async loadDataset () {
+      const filters = this.getAPIFilters()
       const result = await api.loadServices(filters)
       return result
     },
@@ -96,7 +87,6 @@ export default {
 
           // Set state
           this.listingState = 'display'
-          this.setState(this.$route.query)
         } else {
           this.listingState = 'no-results'
         }
@@ -105,91 +95,30 @@ export default {
         this.listingState = 'error'
       }
     },
-    filterQuickChange (filters) {
-      this.filters.keywords = filters.keywords
-    },
-    getCleanQuery () {
-      const q = JSON.parse(JSON.stringify(this.$route.query))
-      // Strip out filter related
-      const strip_fields = ['q', 'id']
-      strip_fields.forEach(field => delete q[field])
-      return q
-    },
-    filterSubmit (filters) {
-      const query = this.getCleanQuery()
-      if (filters.keywords && filters.keywords.length > 0) {
-        query.q = encodeURIComponent(filters.keywords)
+    pagerChange (page) {
+      let query = JSON.parse(JSON.stringify(this.$route.query))
+      delete query['page']
+      if (page > 1) {
+        query['page'] = page
       }
-      // Update router if query has changed.
-      if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
-        this.$router.push({ query: query })
-      }
+      this.$router.push({ query })
+      this.$nextTick(() => {
+        this.$refs['app'].scrollIntoView({ behavior: 'smooth' })
+      })
     },
     selectedResult (result) {
-      window.scrollTo(0, 0)
-      const query = this.getCleanQuery()
-      query[ID_FIELD] = result.id
-      this.$router.push({ query })
-    },
-    backToResults () {
-      this.$router.push({ query: this.getCleanQuery() })
+      this.$router.push({ name: 'service', params: { id: result.id } })
     },
     backToProfile () {
       this.$router.push({ path: '/' })
     },
-    filterList (list) {
-      const hasFilters = (this.filters.keywords)
-      if (hasFilters) {
-        const returnList = []
-        const keywords = this.filters.keywords ? this.filters.keywords.toUpperCase() : false
-        list.forEach(item => {
-          let tests = []
-          // Keyword
-          if (keywords) {
-            tests.push((item.keywordSearch.indexOf(keywords) > -1))
-          }
-          const hasPassed = tests.every(pass => pass === true)
-          if (hasPassed) {
-            returnList.push(item)
-          }
-        })
-        return returnList
-      } else {
-        return list
-      }
-    },
-    sortList (list, name) {
-      list = list.sort((a, b) => a[name].localeCompare(b[name]))
-      return list
-    },
     setState (query) {
-      if (query[ID_FIELD]) {
-        let result = null
-        const navigateToId = query[ID_FIELD].toString()
-        // Find query string service and set as selected.
-        for (let i = 0; i < this.dataset.services.length; i++) {
-          const item = this.dataset.services[i]
-          if (item.id.toString() === navigateToId) {
-            result = item
-            break
-          }
-        }
-        if (result) {
-          this.state = 'full'
-          this.selected = result
-        } else {
-          console.log("Could not find result")
-        }
-      } else {
-        this.state = 'listing'
-        this.selected = null
-        // Filter
-        this.filters.keywords = (query.q) ? decodeURIComponent(query.q) : ''
-      }
+      this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
+      this.load()
     }
   },
   created () {
-    this.load()
+    this.setState(this.$route.query)
   },
   watch: {
     $route: function (to) {

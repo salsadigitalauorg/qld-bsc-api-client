@@ -8,8 +8,8 @@
             class="result__list-item-title-button"
             :class="{ 'result__list-item-title-button--expanded': expanded[index] }"
           >
-            <span>{{ item.title }}</span>
-            <span> ({{ item.serviceInteractions.length }} service {{ item.serviceInteractions.length === 1 ? 'interaction' : 'interactions' }})</span>
+            <span>{{ item.name }}</span>
+            <span> ({{ item.interactions.length }} service {{ item.interactions.length === 1 ? 'interaction' : 'interactions' }})</span>
           </button>
         </h3>
         <div v-if="expanded[index]">
@@ -17,16 +17,16 @@
             <h4>Service</h4>
             <div class="result__sub-paragraph">
               <p>{{ item.description }}</p>
-              <button @click="selected(item)" class="result__subitem-field-title-button">Read more about {{ item.title.toLowerCase() }}</button>
+              <button @click="selected(item)" class="result__subitem-field-title-button">Read more about {{ item.name.toLowerCase() }}</button>
             </div>
           </template>
           <h4>Service interactions</h4>
-          <p v-if="item.serviceInteractions.length === 0" class="result__sub-paragraph">No service interactions available.</p>
+          <p v-if="item.interactions.length === 0" class="result__sub-paragraph">No service interactions available.</p>
           <ol v-else class="result__subitems">
-            <li class="result__subitem" v-for="(sInteraction, siIndex) in item.serviceInteractions" :key="`service-${index}-${siIndex}`">
+            <li class="result__subitem" v-for="(sInteraction, siIndex) in item.interactions" :key="`service-${index}-${siIndex}`">
               <div class="result__subitem-field result__subitem-field-1">
                 <h4 class="result__subitem-field-title">
-                  <button @click="selected(sInteraction)" class="result__subitem-field-title-button">{{ sInteraction.title }}</button>
+                  <button @click="selected(sInteraction)" class="result__subitem-field-title-button">{{ sInteraction.name }}</button>
                 </h4>
               </div>
               <div class="result__subitem-field result__subitem-field-2">
@@ -73,6 +73,7 @@ export default {
   margin: 0;
   padding: 0;
   list-style: none;
+  margin-top: rem(22px);
 
   &__list-item {
     box-sizing: border-box;

@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 import Main from './pages/Main.vue'
 import ProfilePage from './pages/ProfilePage.vue'
 import ResultsPage from './pages/ResultsPage.vue'
+import FullPage from './pages/FullPage.vue'
 
 Vue.config.productionTip = false
 
@@ -13,6 +14,7 @@ var router = new VueRouter({
   routes: [
     { path: '/', component: ProfilePage },
     { path: '/results', name: 'results', component: ResultsPage },
+    { path: '/service/:id', name: 'service', component: FullPage },
   ]
 });
 

@@ -3,7 +3,7 @@
     <button v-if="current > 1" @click="prevPage" class="pager__prev">
       <span>Prev</span>
     </button>
-    <ul class="pager__page-list cdr-default">
+    <ul class="pager__page-list">
       <li v-for="(item, index) in range" :key="index" class="pager__item">
         <span v-if="item === '...'" class="pager__item-dots">{{ item }}</span>
         <button v-else class="pager__item-btn" :class="{ 'pager__item-btn--current': (current === item) }" @click="change(item)">

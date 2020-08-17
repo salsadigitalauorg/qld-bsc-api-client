@@ -1,7 +1,7 @@
 <template>
   <div class="full-view">
     <button @click="back" class="full-view__back">Back</button>
-    <div class="full-view__body">
+    <div v-if="selected" class="full-view__body">
       <div class="full-view__main">
         <h1 class="full-view__title">{{ selected.name }}</h1>
         <div v-for="(item, idx) in displayFields" :key="'body-' + idx">
@@ -25,13 +25,13 @@
 </template>
 
 <script>
+import api from '../libs/api'
+
 export default {
-  name: 'Results',
-  props: {
-    selected: Object
-  },
+  name: 'FullPage',
   data () {
     return {
+      selected: null,
       fields: [
         { title: 'Description', field: 'long_description' },
         { title: 'Who is eligible?', field: 'who_is_eligible' },
@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     back () {
-      this.$emit('back')
+      this.$router.go(-1)
     },
     parseField(field) {
       if (this.selected[field.field]) {
@@ -120,8 +120,21 @@ export default {
       } else {
         return false
       }
-    }
-  }
+    },
+    async load () {
+      try {
+        const result = await api.loadFullService(this.$route.params.id)
+        if (result) {
+          this.selected = result
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    },
+  },
+  created () {
+    this.load()
+  },
 }
 </script>
 
