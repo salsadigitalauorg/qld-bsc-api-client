@@ -7,6 +7,7 @@
           'profile__image--middle-remote': (profile === 'middle-remote'),
           'profile__image--middle-regional': (profile === 'middle-regional'),
           'profile__image--senior': (profile === 'senior'),
+          'profile__image--renter': (profile === 'renter'),
           'profile__image--custom': (profile === 'custom')
         }"
       >
@@ -18,6 +19,7 @@
           <option value="middle-remote">Middle Aged - Country</option>
           <option value="middle-regional">Middle Aged - City</option>
           <option value="senior">Senior</option>
+          <option value="renter">Aussie Renter</option>
           <option value="custom">Custom</option>
         </select>
       </div>
@@ -82,6 +84,16 @@ export default {
           ''
         ],
         'senior': [
+          '8',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          ''
+        ],
+        'renter': [
           '',
           '',
           '',
@@ -90,7 +102,7 @@ export default {
           '',
           '',
           '73'
-        ]
+        ],
       },
       form: []
     }
@@ -169,6 +181,10 @@ export default {
 
     &--senior {
       background-image: url('../assets/senior.png');
+    }
+
+    &--renter {
+      background-image: url('../assets/renter.png');
     }
 
     &--custom {
