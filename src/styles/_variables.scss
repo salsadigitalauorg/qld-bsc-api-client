@@ -1,21 +1,43 @@
+// Font size
 $font-size-base-px: 16px;
-$green: #007eb1;
-$orange: #f8c97c;
-$purple: #dfd1ff;
+
+@function rem($pxval) {
+  $base: $font-size-base-px;
+  @return ($pxval / $base) * 1rem;
+}
+
+// Colours
+$blue: #007eb1;
+$darkblue: #003647;
+$darkblue2: #0C2E4C;
 $focus: #3A6378;
 $brand-back: #ebecef;
 $input-background: #f6f7f8;
 $border-color: #767676;
 $text-color: #000;
+$white: white;
+
+// Spacings
+$column-width: rem(1140px);
+
+// Breakpoints
 $breakpoints: (
   'xs': 0,
   's': 576px,
   'm': 768px,
   'l': 992px,
-  'xl': 1200px,
-  'xxl': 1600px,
-  'xxxl': 2560px
+  'xl': 1200px
 );
+
+@mixin breakpoint($break) {
+  $breakpoint-value: map-get($breakpoints, $break);
+  @if $breakpoint-value == null {
+    @error '"#{$break}" is not an available breakpoint. (#{map-keys($breakpoints)})';
+  }
+  @media screen and (min-width: $breakpoint-value) {
+    @content;
+  }
+}
 
 @mixin arrow_icon {
   background-image: url('../assets/right-arrow.svg');
@@ -33,11 +55,11 @@ $breakpoints: (
   margin-top: -2px;
   vertical-align: middle;
 
-  @if $right == false {
+  @if $right == true {
     margin-left: 4px;
   }
 
-  @if $right == true {
+  @if $right == false {
     transform: rotate(180deg);
     margin-right: 4px;
   }
@@ -50,8 +72,8 @@ $breakpoints: (
 
 @mixin underline {
   text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-decoration-color: $green;
+  text-decoration-thickness: rem(2px);
+  text-decoration-color: $blue;
 
   &:hover,
   &:focus {
@@ -59,25 +81,10 @@ $breakpoints: (
   }
 }
 
-@mixin breakpoint($break) {
-  $breakpoint-value: map-get($breakpoints, $break);
-  @if $breakpoint-value == null {
-    @error '"#{$break}" is not an available breakpoint. (#{map-keys($breakpoints)})';
-  }
-  @media screen and (min-width: $breakpoint-value) {
-    @content;
-  }
-}
-
-@function rem($pxval) {
-  $base: $font-size-base-px;
-  @return ($pxval / $base) * 1rem;
-}
-
 @mixin focus {
   &:focus {
-    outline: 3px solid $focus;
-    outline-offset: 2px;
+    outline: rem(3px) solid $focus;
+    outline-offset: rem(2px);
   }
 }
 
@@ -96,4 +103,37 @@ $breakpoints: (
   clip: rect(0 0 0 0);
   border: 0;
   pointer-events: none;
+}
+
+@mixin button_base($right: true) {
+  @include underline;
+  @include focus;
+  color: $text-color;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  background-color: transparent;
+  font-size: rem(18px);
+  font-weight: 600;
+
+  @if $right == true {
+    &::after {
+      @include arrow_icon_pe($right);
+    }
+  } @else {
+    &::before {
+      @include arrow_icon_pe($right);
+    }
+  }
+}
+
+@mixin content_link {
+  @include focus;
+  color: $blue;
+
+  &:hover,
+  &:focus {
+    color: $darkblue;
+  }
 }

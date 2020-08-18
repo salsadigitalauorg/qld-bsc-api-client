@@ -13,29 +13,42 @@ body {
   margin: 0;
 }
 
+.btn {
+  @include button_base;
+
+  &--small {
+    font-size: rem(16px);
+    font-weight: 400;
+  }
+
+  &--left {
+    @include button_base(false);
+  }
+}
+
 .app {
-  max-width: rem(1140px);
+  max-width: $column-width;
   margin: auto;
   padding: rem(44px) rem(12px);
-  min-height: calc(100vh - (186px + 44px + 117px + 88px));
+  min-height: calc(100vh - rem(186px + 44px + 117px + 88px));
 }
 
 .top {
   height: rem(44px);
-  background-color: #003647;
+  background-color: $darkblue;
 }
 
 .container__inner {
   width: 100%;
-  max-width: rem(1140px);
+  max-width: $column-width;
   margin: auto;
-  padding: 10px rem(12px) 20px rem(12px);
+  padding: rem(10px) rem(12px) rem(20px) rem(12px);
   box-sizing: border-box;
 }
 
 .header {
   height: rem(117px);
-  background-color: $green;
+  background-color: $blue;
 
   img {
     width: rem(275px);
@@ -44,13 +57,13 @@ body {
 
   .header__title {
     font-size: rem(26px);
-    color: white;
+    color: $white;
   }
 }
 
 .footer {
   height: rem(186px);
-  background-color: #0C2E4C;
+  background-color: $darkblue2;
 
   .container__inner {
     height: 100%;
@@ -61,9 +74,9 @@ body {
 
   span,
   a {
-    color: white;
-    font-size: 12px;
-    margin-left: 16px;
+    color: $white;
+    font-size: rem(12px);
+    margin-left: rem(16px);
   }
 }
 </style>

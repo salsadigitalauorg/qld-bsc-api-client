@@ -34,8 +34,8 @@ export default {
   },
   methods: {
     change (item) {
-      this.$emit('change', item)
       this.current = item
+      this.$emit('change', item)
     },
     prevPage () {
       this.change(this.current - 1)
@@ -148,7 +148,7 @@ export default {
 
     &--current {
       .pager__btn-text {
-        color: $green;
+        color: $blue;
         text-decoration: none;
       }
     }

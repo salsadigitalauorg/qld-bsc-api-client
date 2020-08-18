@@ -1,5 +1,7 @@
 # QLD BSC
 
+An example front-end client for the Queensland Government Services API.
+
 ## Project setup
 ```
 npm install

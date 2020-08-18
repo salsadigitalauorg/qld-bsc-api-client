@@ -1,36 +1,50 @@
 <template>
   <div class="full-view">
-    <button @click="back" class="full-view__back">Back</button>
-    <div v-if="selected" class="full-view__body">
-      <div class="full-view__main">
-        <h1 class="full-view__title">{{ selected.name }}</h1>
-        <div v-for="(item, idx) in displayFields" :key="'body-' + idx">
-          <h2>{{ item.title }}</h2>
-          <p v-html="item.html"></p>
+    <button @click="back" class="btn--left">Back</button>
+    <loading v-if="state === 'loading'" />
+    <template v-if="state === 'display'">
+      <div v-if="selected" class="full-view__body">
+        <div class="full-view__main">
+          <h1 class="full-view__title">{{ selected.name }}</h1>
+          <div v-for="(item, idx) in displayFields" :key="'body-' + idx">
+            <h2>{{ item.title }}</h2>
+            <p v-html="item.html"></p>
+          </div>
         </div>
-      </div>
-      <div class="full-view__sidebar">
-        <div class="full-view__contact">
-          <div class="full-view__side-group" v-for="(item, sideId) in displaySidebarGroups" :key="'contact-group-' + sideId">
-            <h2 v-if="item.title">{{ item.title }}</h2>
-            <div class="full-view__side-field" v-for="(field, fieldId) in item.fields" :key="'contact-group-' + sideId + '-' + fieldId">
-              <strong>{{ field.title }}</strong>
-              <p v-html="field.html"></p>
+        <div class="full-view__sidebar">
+          <div class="full-view__contact">
+            <div class="full-view__side-group" v-for="(item, sideId) in displaySidebarGroups" :key="'contact-group-' + sideId">
+              <h2 v-if="item.title">{{ item.title }}</h2>
+              <div class="full-view__side-field" v-for="(field, fieldId) in item.fields" :key="'contact-group-' + sideId + '-' + fieldId">
+                <strong>{{ field.title }}</strong>
+                <p v-html="field.html"></p>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </template>
+    <error v-if="state === 'error'" @retry="load" />
+    <div v-if="state === 'no-results'">
+      <p>No results were returned.</p>
     </div>
   </div>
 </template>
 
 <script>
 import api from '../libs/api'
+import Error from '../components/Error'
+import Loading from '../components/Loading'
 
 export default {
   name: 'FullPage',
+  components: {
+    Error,
+    Loading
+  },
   data () {
     return {
+      state: 'loading',
       selected: null,
       fields: [
         { title: 'Description', field: 'long_description' },
@@ -123,12 +137,16 @@ export default {
     },
     async load () {
       try {
+        this.state = 'loading'
         const result = await api.loadFullService(this.$route.params.id)
         if (result) {
           this.selected = result
+          this.state = 'display'
+        } else {
+          this.state = 'no-results'
         }
       } catch (e) {
-        console.log(e)
+        this.state = 'error'
       }
     },
   },
@@ -143,19 +161,7 @@ export default {
 
 .full-view {
   &__back {
-    @include focus;
-    background-color: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    font-size: rem(18px);
-    font-weight: 600;
-    color: $text-color;
-    @include underline;
-
-    &::before {
-      @include arrow_icon_pe(true);
-    }
+    @include button_base(false);
   }
 
   &__body {
@@ -174,7 +180,7 @@ export default {
     }
 
     a {
-      color: $green;
+      @include content_link;
     }
   }
 
@@ -201,7 +207,7 @@ export default {
     }
 
     a {
-      color: $green;
+      @include content_link;
     }
   }
 
@@ -213,143 +219,10 @@ export default {
     margin-bottom: rem(8px);
   }
 
-  &__top-details {
-    margin-top: rem(32px);
-    margin-bottom: rem(32px);
-  }
-
-  &__row {
-    @include breakpoint(m) {
-      display: flex;
-    }
-  }
-
-  &__logo-wrapper {
-    @include breakpoint(m) {
-      margin-right: rem(32px);
-    }
-  }
-
-  &__logo {
-    width: 100%;
-    max-width: rem(320px) !important;
-  }
-
-  &__brands-image {
-    width: 100%;
-    max-width: rem(320px) !important;
-  }
-
   &__title {
     color: $text-color;
     font-size: rem(24px);
     font-weight: 600;
-  }
-
-  &__details {
-    color: $text-color;
-
-    @include breakpoint(s) {
-      display: table;
-    }
-  }
-
-  &__detail {
-    margin-bottom: rem(16px);
-
-    @include breakpoint(s) {
-      display: table-row;
-      margin-bottom: 0;
-    }
-  }
-
-  &__detail-title {
-    color: $text-color;
-    font-size: rem(18px) !important;
-    font-weight: 600 !important;
-    margin: 0 !important;
-
-    @include breakpoint(s) {
-      display: table-cell;
-      padding: rem(8px) rem(22px) rem(8px) 0;
-    }
-  }
-
-  &__detail-detail {
-    font-size: rem(18px) !important;
-    color: $text-color;
-    margin: 0 !important;
-
-    @include breakpoint(s) {
-      display: table-cell;
-      padding: rem(8px) 0;
-    }
-  }
-
-  &__detail-link {
-    @include focus;
-    @include underline;
-    font-size: rem(18px) !important;
-    color: $text-color;
-  }
-
-  &__detail-list {
-    padding: 0;
-    list-style: none;
-    margin: 0;
-  }
-
-  &__detail-list-item {
-    margin-bottom: rem(16px);
-  }
-
-  &__brand-title {
-    color: $text-color;
-    font-size: rem(24px);
-    font-weight: 600;
-    margin: 0;
-    margin-bottom: rem(16px) !important;
-  }
-
-  &__brand-setion {
-    background-color: $brand-back;
-    padding: rem(64px) rem(20px);
-    margin: rem(16px) 0;
-  }
-
-  &__brands-wrapper {
-    background-color: white;
-    padding: rem(20px);
-  }
-
-  &__brands {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
-  &__brands-item {
-    box-sizing: border-box;
-    margin-bottom: rem(16px);
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  &__brands-title {
-    color: $text-color;
-    font-size: rem(18px) !important;
-    margin: 0;
-  }
-
-  &__brands-description {
-    color: $text-color;
-    margin: 0;
-  }
-
-  &__brands-status {
-    color: $text-color;
   }
 }
 </style>

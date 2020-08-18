@@ -8,6 +8,7 @@ import FullPage from './pages/FullPage.vue'
 
 Vue.config.productionTip = false
 
+// Set up routes
 Vue.use(VueRouter)
 var router = new VueRouter({
   mode: 'hash',

@@ -1,16 +1,14 @@
 <template>
   <div ref="app">
     <button @click="backToProfile" class="full-view__back">Back</button>
-    <div v-if="listingState === 'loading'">
-      <p class="find-a-provider__message">Loading...</p>
-    </div>
-    <template v-if="listingState === 'display'">
+    <loading v-if="state === 'loading'" />
+    <template v-if="state === 'display'">
       <results :list="this.dataset.services" @selected="selectedResult"/>
       <pager v-if="totalSteps > 1" :initial="pager.currentStep" :perstep="pager.itemsPerStep" :total="totalSteps" @change="pagerChange"/>
     </template>
-    <error v-if="listingState === 'error'" @retry="load" />
-    <div v-if="listingState === 'no-results'">
-      <p class="find-a-provider__message">No results were returned.</p>
+    <error v-if="state === 'error'" @retry="load" />
+    <div v-if="state === 'no-results'">
+      <p>No results were found.</p>
     </div>
   </div>
 </template>
@@ -20,21 +18,20 @@ import api from '../libs/api'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
 import Error from '../components/Error'
+import Loading from '../components/Loading'
 
 export default {
   name: 'ResultsPage',
   components: {
     Results,
     Pager,
-    Error
+    Error,
+    Loading
   },
   data () {
     return {
       dataset: null,
-      state: 'listing',
-      listingState: 'loading',
-      selected: null,
-      pageTitle: null,
+      state: 'loading',
       pager: {
         currentStep: 1,
         itemsPerStep: 50,
@@ -49,7 +46,7 @@ export default {
   },
   methods: {
     getAPIFilters () {
-      // Covert profile criteria into filters.
+      // Profile criteria
       const query = this.$route.query
       const filters = []
       Object.keys(query).forEach(key => {
@@ -80,19 +77,16 @@ export default {
     },
     async load () {
       try {
-        this.listingState = 'loading'
+        this.state = 'loading'
         const dataset = await this.loadDataset()
         if (dataset) {
           this.dataset = dataset
-
-          // Set state
-          this.listingState = 'display'
+          this.state = 'display'
         } else {
-          this.listingState = 'no-results'
+          this.state = 'no-results'
         }
       } catch (e) {
-        console.log(e)
-        this.listingState = 'error'
+        this.state = 'error'
       }
     },
     pagerChange (page) {
