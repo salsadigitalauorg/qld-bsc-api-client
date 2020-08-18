@@ -37,7 +37,7 @@ export default {
       pageTitle: null,
       pager: {
         currentStep: 1,
-        itemsPerStep: 10,
+        itemsPerStep: 50,
         totalCount: 1
       }
     }
