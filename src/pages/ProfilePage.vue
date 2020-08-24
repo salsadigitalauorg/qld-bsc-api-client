@@ -81,27 +81,32 @@ export default {
         Object.keys(results).forEach(key => {
           const criteria = results[key]
           const field = this.fieldMap[key]
-          const defaultCriterion = criteria.find(criterion => criterion.name === 'Any')
-          this.form.push({
-            label: field.label,
-            value: defaultCriterion ? defaultCriterion.id : '',
-            name: field.queryName,
-            options: criteria,
-          })
+          if (field) {
+            const defaultId = this.getAnyId(criteria)
+            this.form.push({
+              label: field.label,
+              value: defaultId,
+              name: field.queryName,
+              options: criteria,
+            })
+          }
         })
       } catch (e) {
         this.networkError = true
       }
     },
+    getAnyId (options) {
+      const defaultCriterion = options.find(criterion => criterion.name === 'Any')
+      return defaultCriterion ? defaultCriterion.id : ''
+    },
     updateForm () {
       if (this.profile !== '') {
         const isCustom = (this.profile === 'custom')
-        this.form.forEach(item => {
-          if (!isCustom && this.profileForms[this.profile][item.name]) {
-            item.value = this.profileForms[this.profile][item.name]
+        this.form.forEach(field => {
+          if (!isCustom && this.profileForms[this.profile][field.name]) {
+            field.value = this.profileForms[this.profile][field.name]
           } else {
-            const defaultCriterion = item.options.find(criterion => criterion.name === 'Any')
-            item.value = defaultCriterion ? defaultCriterion.id : ''
+            field.value = this.getAnyId(field.options)
           }
         })
       }
@@ -109,10 +114,14 @@ export default {
     submit () {
       if (this.profile.length > 0) {
         const query = {}
-        this.form.forEach(item => {
-          if (item.value) {
-            query[item.name] = item.value
+        this.form.forEach(field => {
+          const values = []
+          const anyId = this.getAnyId(field.options)
+          if (field.value !== anyId) {
+            values.push(anyId)
           }
+          values.push(field.value)
+          query[field.name] = values
         })
         this.$router.push({ name: 'results', query })
       }

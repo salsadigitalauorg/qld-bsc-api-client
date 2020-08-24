@@ -54,10 +54,13 @@ export default {
           const val = query[key]
           if (val) {
             const field = api.getCriteriaFromQuery(key)
-            filters.push({
-              field: field.fieldName,
-              value: val
-            })
+            if (Array.isArray(val)) {
+              val.forEach(arrVal => {
+                filters.push({field: field.fieldName, value: arrVal })
+              })
+            } else {
+              filters.push({field: field.fieldName, value: val })
+            }
           }
         }
       })

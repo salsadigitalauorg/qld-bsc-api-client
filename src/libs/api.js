@@ -329,6 +329,7 @@ function getCriteriaFields () {
 
 /**
  * Get Filter Criteria object from it's query.
+ * @param {String} queryName The name of the query field.
  */
 function getCriteriaFromQuery (query) {
   const criteria = Object.keys(criteriaFields)
