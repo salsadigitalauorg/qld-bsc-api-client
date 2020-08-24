@@ -31,7 +31,6 @@
             <span class="input__label">{{ field.label }}</span>
             <div class="input__select-wrapper">
               <select class="input__select" v-model="field.value">
-                <option value=""></option>
                 <option v-for="(option, fieldId) in field.options" :value="option.id" :key="`field-${idx}-${fieldId}`">{{ option.name }}</option>
               </select>
             </div>
@@ -58,46 +57,19 @@ export default {
       profile: '',
       fieldMap: api.getCriteriaFields(),
       profileForms: {
-        'middle-remote': [
-          '6',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          ''
-        ],
-        'middle-regional': [
-          '',
-          '',
-          '',
-          '',
-          '',
-          '63',
-          '',
-          ''
-        ],
-        'senior': [
-          '8',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          ''
-        ],
-        'renter': [
-          '',
-          '',
-          '',
-          '',
-          '53',
-          '',
-          '',
-          '73'
-        ],
+        'middle-remote': {
+          age: '6'
+        },
+        'middle-regional': {
+          lifestage: '63'
+        },
+        'senior': {
+          age: '8'
+        },
+        'renter': {
+          housing: '53',
+          residency: '73'
+        },
       },
       form: []
     }
@@ -109,9 +81,10 @@ export default {
         Object.keys(results).forEach(key => {
           const criteria = results[key]
           const field = this.fieldMap[key]
+          const defaultCriterion = criteria.find(criterion => criterion.name === 'Any')
           this.form.push({
             label: field.label,
-            value: '',
+            value: defaultCriterion ? defaultCriterion.id : '',
             name: field.queryName,
             options: criteria,
           })
@@ -123,8 +96,13 @@ export default {
     updateForm () {
       if (this.profile !== '') {
         const isCustom = (this.profile === 'custom')
-        this.form.forEach((item, index) => {
-          item.value = isCustom ? '' : this.profileForms[this.profile][index]
+        this.form.forEach(item => {
+          if (!isCustom && this.profileForms[this.profile][item.name]) {
+            item.value = this.profileForms[this.profile][item.name]
+          } else {
+            const defaultCriterion = item.options.find(criterion => criterion.name === 'Any')
+            item.value = defaultCriterion ? defaultCriterion.id : ''
+          }
         })
       }
     },

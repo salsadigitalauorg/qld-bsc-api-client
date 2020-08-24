@@ -55,7 +55,11 @@ export default {
         { title: 'Do it online', field: 'do_it_online_url', type: 'url'},
         { title: 'More information', field: 'more_information_url', type: 'url'},
         { title: 'Form', field: 'form_url', type: 'url'},
-        { title: 'Who do I call?', field: 'who_do_i_call' }
+        { title: 'Who do I call?', field: 'who_do_i_call' },
+        { title: 'Message applied', field: 'message_applied' },
+        { title: 'Message problem', field: 'message_problem' },
+        { title: 'Message progress', field: 'message_progress' },
+        { title: 'Message provisioned', field: 'message_provisioned' }
       ],
       sidebarGroups: [
         {

@@ -1,7 +1,8 @@
 const axios = require('axios')
 
 // Service Content API
-const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
+// const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
+const domain = 'https://nginx-php-qld-bsc-feature-criteria-any.au.amazee.io/'
 const auth = {
   username: 'bsc',
   password: 'bsc2020'
@@ -43,6 +44,11 @@ const criteriaFields = {
     label: 'Lifestage',
     queryName: 'lifestage',
     fieldName: 'f_criteria_lifestage'
+  },
+  criteria_work: {
+    label: 'Work',
+    queryName: 'work',
+    fieldName: 'f_criteria_work'
   },
   criteria_location: {
     label: 'Location',
@@ -182,6 +188,10 @@ function getFullServiceFromAPIData (data) {
     short_description: attrs.f_short_description ? attrs.f_short_description : '',
     who_do_i_call: attrs.f_who_do_i_call ? attrs.f_who_do_i_call : '',
     who_is_eligible: attrs.f_who_is_eligible ? attrs.f_who_is_eligible.processed : '',
+    message_applied: attrs.f_message_applied ? attrs.f_message_applied.processed : '',
+    message_problem: attrs.f_message_problem ? attrs.f_message_problem.processed : '',
+    message_progress: attrs.f_message_progress ? attrs.f_message_progress.processed : '',
+    message_provisioned: attrs.f_message_provisioned ? attrs.f_message_provisioned.processed : ''
   }
   // Add agencies
   if (item.relationships.f_agency) {
