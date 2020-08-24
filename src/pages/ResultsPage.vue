@@ -56,10 +56,10 @@ export default {
             const field = api.getCriteriaFromQuery(key)
             if (Array.isArray(val)) {
               val.forEach(arrVal => {
-                filters.push({field: field.fieldName, value: arrVal })
+                filters.push({filter: field.filterName, value: arrVal })
               })
             } else {
-              filters.push({field: field.fieldName, value: val })
+              filters.push({filter: field.filterName, value: val })
             }
           }
         }

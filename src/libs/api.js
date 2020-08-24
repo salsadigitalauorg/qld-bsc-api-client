@@ -1,8 +1,7 @@
 const axios = require('axios')
 
 // Service Content API
-// const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
-const domain = 'https://nginx-php-qld-bsc-feature-criteria-any.au.amazee.io/'
+const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
 const auth = {
   username: 'bsc',
   password: 'bsc2020'
@@ -12,64 +11,63 @@ const auth = {
  * Filter Criteria
  * label: Display on the Profile page
  * queryName: Used in the URL on /results
- * fieldName: Name of API field to query
+ * filterName: Name of API field to query
  */
 const criteriaFields = {
   criteria_age: {
     label: 'Age',
     queryName: 'age',
-    fieldName: 'f_criteria_age'
+    filterName: 'f_c_age'
   },
   criteria_authentication_level: {
     label: 'Authentication level',
     queryName: 'auth',
-    fieldName: 'f_criteria_authentication_level'
+    filterName: 'f_c_authentication_level'
   },
   criteria_business_sector: {
     label: 'Business sector',
     queryName: 'sector',
-    fieldName: 'f_criteria_business_sector'
+    filterName: 'f_c_business_sector'
   },
   criteria_card_licences_permits: {
     label: 'Card, licenses and permits',
     queryName: 'permits',
-    fieldName: 'f_criteria_card_licences_permits'
+    filterName: 'f_c_card_licences_permits'
   },
   criteria_housing: {
     label: 'Housing',
     queryName: 'housing',
-    fieldName: 'f_criteria_housing'
+    filterName: 'f_c_housing'
   },
   criteria_lifestage: {
     label: 'Lifestage',
     queryName: 'lifestage',
-    fieldName: 'f_criteria_lifestage'
+    filterName: 'f_c_lifestage'
   },
   criteria_work: {
     label: 'Work',
     queryName: 'work',
-    fieldName: 'f_criteria_work'
+    filterName: 'f_c_work'
   },
   criteria_location: {
     label: 'Location',
     queryName: 'loc',
-    fieldName: 'f_criteria_location'
+    filterName: 'f_c_location'
   },
   criteria_residency_status: {
     label: 'Residency status',
     queryName: 'residency',
-    fieldName: 'f_criteria_residency_status'
+    filterName: 'f_c_residency_status'
   }
 }
 
 /**
  * Generate an API url for services.
  * Includes f_agency field by default.
- * Filters is an Array with 3 types:
- *   Taxonomy:    { field: 'f_criteria_age', value: '6' }   => filter[f_criteria_age.tid][value]=6`
+ * Filters is an Array with 2 types:
  *   General:     { filter: 'nid', value: '10' }            => filter[nid][value]=10
  *   Pagination:  { page: 'offset', value: '10' }           => page[offset]=10
- * @param {Array} filters Taxonomy: { field, value }, General: { filter, value }, Pagination: { page, value }
+ * @param {Array} filters General: { filter, value }, Pagination: { page, value }
  */
 function buildUrl(filters) {
   let queries = []
@@ -79,9 +77,7 @@ function buildUrl(filters) {
   if (filters) {
     filters.forEach(filter => {
       if (filter.value && filter.value !== '') {
-        if (filter.field) {
-          queries.push(`filter[${filter.field}.tid][value]=${filter.value}`)
-        } else if (filter.filter) {
+        if (filter.filter) {
           queries.push(`filter[${filter.filter}][value]=${filter.value}`)
         } else if (filter.page) {
           queries.push(`page[${filter.page}]=${filter.value}`)
