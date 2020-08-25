@@ -134,7 +134,7 @@ async function recursiveRequest (url) {
  * Returns an object with criteria names as keys, and arrays as values.
  */
 async function loadCriteria () {
-  const result = await recursiveRequest(`${domain}api/v1/eligibility_criteria`)
+  const result = await recursiveRequest(`${domain}api/v1/eligibility_criteria?sort=weight`)
 
   if (result && result.length > 0) {
     const criteria = {}
