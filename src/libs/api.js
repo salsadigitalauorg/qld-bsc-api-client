@@ -1,7 +1,6 @@
 const axios = require('axios')
 
 // Service Content API
-const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
 const auth = {
   username: 'bsc',
   password: 'bsc2020'
@@ -69,7 +68,7 @@ const criteriaFields = {
  *   Pagination:  { page: 'offset', value: '10' }           => page[offset]=10
  * @param {Array} filters General: { filter, value }, Pagination: { page, value }
  */
-function buildUrl(filters) {
+function buildUrl(domain, filters) {
   let queries = []
 
   queries.push(`include=f_agency`)
@@ -133,7 +132,7 @@ async function recursiveRequest (url) {
  * Loads all filter criteria.
  * Returns an object with criteria names as keys, and arrays as values.
  */
-async function loadCriteria () {
+async function loadCriteria (domain) {
   const result = await recursiveRequest(`${domain}api/v1/eligibility_criteria?sort=weight`)
 
   if (result && result.length > 0) {
@@ -266,8 +265,8 @@ function getAPIData (apiResult) {
  *   Pagination:  { page: 'offset', value: '10' }           => page[offset]=10
  * @param {Array} filters Taxonomy: { field, value }, General: { filter, value }, Pagination: { page, value }
  */
-async function loadServices (filters) {
-  const result = await request(buildUrl(filters))
+async function loadServices (domain, filters) {
+  const result = await request(buildUrl(domain, filters))
   const results = getAPIData(result)
 
   if (results) {
@@ -313,9 +312,9 @@ async function loadServices (filters) {
  * Load a Service / Service Interaction from API given an id.
  * @param {String} id Node Id of Service / Service Interaction
  */
-async function loadFullService (id) {
+async function loadFullService (domain, id) {
   if (id) {
-    const result = await request(buildUrl([{ filter: 'nid', value: id }]))
+    const result = await request(buildUrl(domain, [{ filter: 'nid', value: id }]))
     const results = getAPIData(result)
     return (results) ? getFullServiceFromAPIData(result.data) : false
   }
@@ -348,5 +347,9 @@ module.exports = {
   loadServices,
   loadFullService,
   getCriteriaFields,
-  getCriteriaFromQuery
+  getCriteriaFromQuery,
+  domains: {
+    master: 'https://nginx-php-qld-bsc-master.au.amazee.io/',
+    develop: 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
+  }
 }

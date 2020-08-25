@@ -108,6 +108,9 @@ export default {
         }
       })
       return rendered
+    },
+    isDev () {
+      return (this.$route.query.dev && this.$route.query.dev === 'true')
     }
   },
   methods: {
@@ -142,7 +145,8 @@ export default {
     async load () {
       try {
         this.state = 'loading'
-        const result = await api.loadFullService(this.$route.params.id)
+        const domain = this.isDev ? api.domains.develop : api.domains.master
+        const result = await api.loadFullService(domain, this.$route.params.id)
         if (result) {
           this.selected = result
           this.state = 'display'

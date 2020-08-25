@@ -74,10 +74,16 @@ export default {
       form: []
     }
   },
+  computed: {
+    isDev () {
+      return (this.$route.query.dev && this.$route.query.dev === 'true')
+    }
+  },
   methods: {
     async load () {
       try {
-        const results = await api.loadCriteria()
+        const domain = this.isDev ? api.domains.develop : api.domains.master
+        const results = await api.loadCriteria(domain)
         Object.keys(results).forEach(key => {
           const criteria = results[key]
           const field = this.fieldMap[key]
@@ -120,6 +126,9 @@ export default {
             query[field.name] = [anyId, field.value]
           }
         })
+        if (this.isDev) {
+          query['dev'] = 'true'
+        }
         this.$router.push({ name: 'results', query })
       }
     }
