@@ -115,13 +115,10 @@ export default {
       if (this.profile.length > 0) {
         const query = {}
         this.form.forEach(field => {
-          const values = []
           const anyId = this.getAnyId(field.options)
           if (field.value !== anyId) {
-            values.push(anyId)
+            query[field.name] = [anyId, field.value]
           }
-          values.push(field.value)
-          query[field.name] = values
         })
         this.$router.push({ name: 'results', query })
       }
