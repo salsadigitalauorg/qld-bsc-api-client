@@ -81,6 +81,12 @@ function buildUrl(filters) {
           queries.push(`filter[${filter.filter}][value]=${filter.value}`)
         } else if (filter.page) {
           queries.push(`page[${filter.page}]=${filter.value}`)
+        } else if (filter.group) {
+          filter.value.forEach(value => {
+            queries.push(`filter[${filter.group}][condition][value][]=${value}`)
+          })
+          queries.push(`filter[${filter.group}][condition][path]=${filter.path}`)
+          queries.push(`filter[${filter.group}][condition][operator]=${filter.operator}`)
         }
       }
     })

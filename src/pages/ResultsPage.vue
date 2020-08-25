@@ -55,11 +55,10 @@ export default {
           if (val) {
             const field = api.getCriteriaFromQuery(key)
             if (Array.isArray(val)) {
-              val.forEach(arrVal => {
-                filters.push({filter: field.filterName, value: arrVal })
-              })
+              const groupName = field.filterName.replace('f_c_', 'group_')
+              filters.push({ group: groupName, path: field.filterName, value: val, operator: 'IN' })
             } else {
-              filters.push({filter: field.filterName, value: val })
+              filters.push({ filter: field.filterName, value: val })
             }
           }
         }
