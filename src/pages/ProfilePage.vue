@@ -48,6 +48,7 @@
 
 <script>
 import api from '../libs/api'
+import criteria from '../libs/criteria'
 
 export default {
   name: 'ProfilePage',
@@ -55,7 +56,7 @@ export default {
     return {
       networkError: false,
       profile: '',
-      fieldMap: api.getCriteriaFields(),
+      fieldMap: criteria.getCriteriaFields(),
       profileForms: {
         'middle-remote': {
           age: '6'

@@ -15,6 +15,7 @@
 
 <script>
 import api from '../libs/api'
+import criteria from '../libs/criteria'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
 import Error from '../components/Error'
@@ -45,36 +46,41 @@ export default {
     }
   },
   methods: {
-    getAPIFilters () {
+    getAPIFilter () {
       // Profile criteria
       const query = this.$route.query
-      const filters = []
+      const filter = {}
       Object.keys(query).forEach(key => {
         if (key !== 'page') {
           const val = query[key]
           if (val) {
-            const field = api.getCriteriaFromQuery(key)
+            const field = criteria.getCriteriaFromQuery(key)
             if (Array.isArray(val)) {
               const groupName = field.filterName.replace('f_c_', 'group_')
-              filters.push({ group: groupName, path: field.filterName, value: val, operator: 'IN' })
+              filter[groupName] = { condition: { value: val, path: field.filterName, operator: 'IN' } }
             } else {
-              filters.push({ filter: field.filterName, value: val })
+              filter[field.filterName] = { value: val }
             }
           }
         }
       })
-      // Pager size
-      filters.push({ page: `limit`, value: this.pager.itemsPerStep })
-      // Pager offset
+      return filter
+    },
+    getAPIPage () {
+      const page = { limit: this.pager.itemsPerStep }
       const offset = (this.pager.currentStep - 1) * this.pager.itemsPerStep
       if (offset > 0) {
-        filters.push({ page: `offset`, value: offset })
+        page['offset'] = offset
       }
-      return filters
+      return page
     },
     async loadDataset () {
-      const filters = this.getAPIFilters()
-      const result = await api.loadServices(filters)
+      const filter = this.getAPIFilter()
+      const page = this.getAPIPage()
+      const result = await api.loadServiceInteractions({ filter, page })
+      // TODO - Results are currently only service interactions.
+      // Will need to condition the results into:
+      // { services: [ { id, name, description, interactions: [ { id, name, description } ] } ] }
       return result
     },
     async load () {
@@ -88,6 +94,7 @@ export default {
           this.state = 'no-results'
         }
       } catch (e) {
+        console.log(e)
         this.state = 'error'
       }
     },
