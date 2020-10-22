@@ -2,7 +2,7 @@
  * Simplify result data fields for a full service.
  * @param {Array} data
  */
-function fullService (data) {
+function fullServiceInteraction (data) {
   if (data.data && data.data.length > 0) {
     const item = data.data[0]
     const type = item.type.replace('node--', '')
@@ -91,6 +91,27 @@ function criteria (data) {
 }
 
 /**
+ * Simplify result data fields for Service
+ * @param {Array} data
+ */
+function service (data) {
+  if (data.data && data.data.length > 0) {
+    const services = []
+    data.data.forEach(item => {
+      services.push({
+        id: item.attributes.drupal_internal__tid, // TODO - Set as default interaction nid
+        tid: item.attributes.drupal_internal__tid,
+        name: item.attributes.name,
+        description: item.attributes.f_agency_type, // TODO - Set as description
+      })
+    })
+    return services
+  } else {
+    return false
+  }
+}
+
+/**
  * Simplify result data fields for Service Interactions
  * @param {Array} data
  */
@@ -114,6 +135,7 @@ function serviceInteraction (data) {
 
 module.exports = {
   criteria,
-  fullService,
+  service,
+  fullServiceInteraction,
   serviceInteraction
 }

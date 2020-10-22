@@ -16,6 +16,7 @@
 <script>
 import api from '../libs/api'
 import criteria from '../libs/criteria'
+import serviceInteractions from '../libs/serviceInteractions'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
 import Error from '../components/Error'
@@ -78,10 +79,8 @@ export default {
       const filter = this.getAPIFilter()
       const page = this.getAPIPage()
       const result = await api.loadServiceInteractions({ filter, page })
-      // TODO - Results are currently only service interactions.
-      // Will need to condition the results into:
-      // { services: [ { id, name, description, interactions: [ { id, name, description } ] } ] }
-      return result
+      const parsed = serviceInteractions.getServiceGroupsFromInteractions(result)
+      return parsed
     },
     async load () {
       try {

@@ -18,6 +18,19 @@ async function loadCriteria () {
 }
 
 /**
+ * Loads all filter criteria.
+ * Returns an object with criteria names as keys, and arrays as values.
+ */
+async function loadServices (options) {
+  const data = await queryAPI({
+    endpoint: `${domain}api/v1/taxonomy_term/agencies`, // TODO - Swap to: api/v1/taxonomy_term/service
+    endpointAuth: auth,
+    filter: options.filter
+  })
+  return parse.service(data)
+}
+
+/**
  *
  * @param {Object} options Filters and pages { filter: {}, page: { limit, offset } }
  */
@@ -48,7 +61,7 @@ async function loadFullServiceInteraction (id) {
       include: ['f_agency'],
       filter: { nid: id }
     })
-    return parse.fullService(data)
+    return parse.fullServiceInteraction(data)
   } else {
     return false
   }
@@ -56,6 +69,7 @@ async function loadFullServiceInteraction (id) {
 
 module.exports = {
   loadCriteria,
+  loadServices,
   loadServiceInteractions,
   loadFullServiceInteraction
 }

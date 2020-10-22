@@ -142,7 +142,7 @@ export default {
     async load () {
       try {
         this.state = 'loading'
-        const result = await api.loadFullService(this.$route.params.id)
+        const result = await api.loadFullServiceInteraction(this.$route.params.id)
         if (result) {
           this.selected = result
           this.state = 'display'
