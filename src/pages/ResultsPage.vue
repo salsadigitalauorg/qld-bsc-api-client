@@ -36,7 +36,7 @@ export default {
       state: 'loading',
       pager: {
         currentStep: 1,
-        itemsPerStep: 50,
+        itemsPerStep: 10,
         totalCount: 1
       }
     }
