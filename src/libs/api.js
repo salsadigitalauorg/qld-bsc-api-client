@@ -1,16 +1,13 @@
 const { queryAPI, queryAPIAll } = require('./utils')
 
-const domain = 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
-const auth = { username: 'bsc', password: 'bsc2020' }
-
 /**
  * Loads all filter criteria.
  * Returns an object with criteria names as keys, and arrays as values.
  */
-async function loadCriteria () {
+async function loadCriteria (domain) {
   const data = await queryAPIAll({
-    endpoint: `${domain}api/v1/eligibility_criteria`,
-    endpointAuth: auth,
+    endpoint: `${domain.url}api/v1/eligibility_criteria`,
+    endpointAuth: domain.auth,
     sort: [ 'weight' ]
   })
   return data
@@ -20,10 +17,10 @@ async function loadCriteria () {
  * Loads all filter criteria.
  * Returns an object with criteria names as keys, and arrays as values.
  */
-async function loadServices (options) {
+async function loadServices (domain, options) {
   const data = await queryAPI({
-    endpoint: `${domain}api/v1/taxonomy_term/services`,
-    endpointAuth: auth,
+    endpoint: `${domain.url}api/v1/taxonomy_term/services`,
+    endpointAuth: domain.auth,
     filter: options.filter
   })
   return data
@@ -33,10 +30,10 @@ async function loadServices (options) {
  * Loads a list of service interactions.
  * @param {Object} options Filters and pages { filter: {}, page: { limit, offset } }
  */
-async function loadServiceInteractions (options) {
+async function loadServiceInteractions (domain, options) {
   const data = await queryAPI({
-    endpoint: `${domain}api/v1/node/service_interaction`,
-    endpointAuth: auth,
+    endpoint: `${domain.url}api/v1/node/service_interaction`,
+    endpointAuth: domain.auth,
     include: [],
     filter: options.filter,
     sort: [
@@ -52,11 +49,11 @@ async function loadServiceInteractions (options) {
  * Load a Service Interaction from API given an id.
  * @param {String} id Node Id of Service / Service Interaction
  */
-async function loadFullServiceInteraction (id) {
+async function loadFullServiceInteraction (domain, id) {
   if (id) {
     const data = await queryAPI({
-      endpoint: `${domain}api/v1/node/service_interaction`,
-      endpointAuth: auth,
+      endpoint: `${domain.url}api/v1/node/service_interaction`,
+      endpointAuth: domain.auth,
       include: ['f_agency'],
       filter: { nid: id }
     })

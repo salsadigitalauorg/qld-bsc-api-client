@@ -33,6 +33,7 @@
 
 <script>
 import dataservice from '../libs/dataservice'
+import settings from '../libs/settings'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 
@@ -108,6 +109,9 @@ export default {
         }
       })
       return rendered
+    },
+    isDev () {
+      return (this.$route.query.dev && this.$route.query.dev === 'true')
     }
   },
   methods: {
@@ -142,7 +146,8 @@ export default {
     async load () {
       try {
         this.state = 'loading'
-        const result = await dataservice.getFullServiceInteraction(this.$route.params.id)
+        const domain = this.isDev ? settings.domain.dev : settings.domain.master
+        const result = await dataservice.getFullServiceInteraction(domain, this.$route.params.id)
         if (result) {
           this.selected = result
           this.state = 'display'

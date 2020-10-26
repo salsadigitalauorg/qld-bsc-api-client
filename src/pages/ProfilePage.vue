@@ -48,6 +48,7 @@
 
 <script>
 import dataservice from '../libs/dataservice'
+import settings from '../libs/settings'
 import criteria from '../libs/criteria'
 
 export default {
@@ -75,10 +76,16 @@ export default {
       form: []
     }
   },
+  computed: {
+    isDev () {
+      return (this.$route.query.dev && this.$route.query.dev === 'true')
+    }
+  },
   methods: {
     async load () {
       try {
-        const results = await dataservice.getCriteria()
+        const domain = this.isDev ? settings.domain.dev : settings.domain.master
+        const results = await dataservice.getCriteria(domain)
         Object.keys(results).forEach(key => {
           const criteria = results[key]
           const field = this.fieldMap[key]
@@ -122,6 +129,9 @@ export default {
             query[field.name] = [anyId, field.value]
           }
         })
+        if (this.isDev) {
+          query['dev'] = 'true'
+        }
         this.$router.push({ name: 'results', query })
       }
     }

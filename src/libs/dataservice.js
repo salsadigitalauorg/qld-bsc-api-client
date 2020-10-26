@@ -1,19 +1,19 @@
 const api = require('./api')
 const parse = require('./mapping')
 
-async function getCriteria () {
-  const data = await api.loadCriteria()
+async function getCriteria (domain) {
+  const data = await api.loadCriteria(domain)
   return parse.criteria(data)
 }
 
-async function getGroupedServiceInteractions (options) {
-  const interactionsData = await api.loadServiceInteractions(options)
+async function getGroupedServiceInteractions (domain, options) {
+  const interactionsData = await api.loadServiceInteractions(domain, options)
   const interactionsResults = parse.serviceInteraction(interactionsData)
   // 1) Get unique service ids
   const serviceIds = new Set()
   interactionsResults.forEach(interaction => serviceIds.add(interaction.service_id))
   // 2) Query API for service taxonomy terms
-  const serviceData = await api.loadServices({
+  const serviceData = await api.loadServices(domain, {
     filter: {
       group_tid: { condition: { path: 'tid', value: Array.from(serviceIds), operator: 'IN' } }
     }
@@ -34,8 +34,8 @@ async function getGroupedServiceInteractions (options) {
   }
 }
 
-async function getFullServiceInteraction (id) {
-  const data = await api.loadFullServiceInteraction(id)
+async function getFullServiceInteraction (domain, id) {
+  const data = await api.loadFullServiceInteraction(domain, id)
   return parse.fullServiceInteraction(data)
 }
 

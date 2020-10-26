@@ -15,6 +15,7 @@
 
 <script>
 import dataservice from '../libs/dataservice'
+import settings from '../libs/settings'
 import criteria from '../libs/criteria'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
@@ -43,6 +44,9 @@ export default {
   computed: {
     totalSteps () {
       return Math.ceil(this.dataset.totalCount / this.pager.itemsPerStep)
+    },
+    isDev () {
+      return (this.$route.query.dev && this.$route.query.dev === 'true')
     }
   },
   methods: {
@@ -51,7 +55,7 @@ export default {
       const query = this.$route.query
       const filter = {}
       Object.keys(query).forEach(key => {
-        if (key !== 'page') {
+        if (key !== 'page' && key !== 'dev') {
           const val = query[key]
           if (val) {
             const field = criteria.getCriteriaFromQuery(key)
@@ -77,7 +81,8 @@ export default {
     async loadDataset () {
       const filter = this.getAPIFilter()
       const page = this.getAPIPage()
-      const result = await dataservice.getGroupedServiceInteractions({ filter, page })
+      const domain = this.isDev ? settings.domain.dev : settings.domain.master
+      const result = await dataservice.getGroupedServiceInteractions(domain, { filter, page })
       return result
     },
     async load () {
@@ -107,10 +112,18 @@ export default {
       })
     },
     selectedResult (result) {
-      this.$router.push({ name: 'service', params: { id: result.id } })
+      const query = {}
+      if (this.isDev) {
+        query['dev'] = 'true'
+      }
+      this.$router.push({ name: 'service', params: { id: result.id }, query })
     },
     backToProfile () {
-      this.$router.push({ path: '/' })
+      const query = {}
+      if (this.isDev) {
+        query['dev'] = 'true'
+      }
+      this.$router.push({ path: '/', query })
     },
     setState (query) {
       this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
