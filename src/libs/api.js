@@ -1,5 +1,4 @@
 const { queryAPI, queryAPIAll } = require('./utils')
-const parse = require('./mapping')
 
 const domain = 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
 const auth = { username: 'bsc', password: 'bsc2020' }
@@ -14,7 +13,7 @@ async function loadCriteria () {
     endpointAuth: auth,
     sort: [ 'weight' ]
   })
-  return parse.criteria(data)
+  return data
 }
 
 /**
@@ -27,7 +26,7 @@ async function loadServices (options) {
     endpointAuth: auth,
     filter: options.filter
   })
-  return parse.service(data)
+  return data
 }
 
 /**
@@ -46,40 +45,11 @@ async function loadServiceInteractions (options) {
     ],
     page: options.page
   })
-  return parse.serviceInteraction(data)
+  return data
 }
 
 /**
- * Loads grouped services.
- */
-async function loadGroupedServiceInteractions (options) {
-  const interactionsResult = await loadServiceInteractions(options)
-  // 1) Get unique service ids
-  const serviceIds = new Set()
-  interactionsResult.interactions.forEach(interaction => serviceIds.add(interaction.service_id))
-  // 2) Query API for service taxonomy terms
-  const serviceResults = await loadServices({
-    filter: {
-      group_tid: { condition: { path: 'tid', value: Array.from(serviceIds), operator: 'IN' } }
-    }
-  })
-  // 3) Create array of services
-  const services = {}
-  serviceResults.forEach(service => {
-    service.interactions = []
-    services[service.tid] = service
-  })
-  // 4) Map interactions with their service
-  interactionsResult.interactions.forEach(interaction => services[interaction.service_id].interactions.push(interaction))
-  const groupedServices = Object.keys(services).map(key => services[key])
-  return {
-    services: groupedServices,
-    totalCount: interactionsResult.totalCount
-  }
-}
-
-/**
- * Load a Service / Service Interaction from API given an id.
+ * Load a Service Interaction from API given an id.
  * @param {String} id Node Id of Service / Service Interaction
  */
 async function loadFullServiceInteraction (id) {
@@ -90,7 +60,7 @@ async function loadFullServiceInteraction (id) {
       include: ['f_agency'],
       filter: { nid: id }
     })
-    return parse.fullServiceInteraction(data)
+    return data
   } else {
     return false
   }
@@ -100,6 +70,5 @@ module.exports = {
   loadCriteria,
   loadServices,
   loadServiceInteractions,
-  loadGroupedServiceInteractions,
   loadFullServiceInteraction
 }

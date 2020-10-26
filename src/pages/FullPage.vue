@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import api from '../libs/api'
+import dataservice from '../libs/dataservice'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 
@@ -142,7 +142,7 @@ export default {
     async load () {
       try {
         this.state = 'loading'
-        const result = await api.loadFullServiceInteraction(this.$route.params.id)
+        const result = await dataservice.getFullServiceInteraction(this.$route.params.id)
         if (result) {
           this.selected = result
           this.state = 'display'

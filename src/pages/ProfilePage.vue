@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import api from '../libs/api'
+import dataservice from '../libs/dataservice'
 import criteria from '../libs/criteria'
 
 export default {
@@ -78,7 +78,7 @@ export default {
   methods: {
     async load () {
       try {
-        const results = await api.loadCriteria()
+        const results = await dataservice.getCriteria()
         Object.keys(results).forEach(key => {
           const criteria = results[key]
           const field = this.fieldMap[key]

@@ -142,7 +142,7 @@ function serviceInteraction (data) {
         service_label: getObjectProperty(item, 'relationships.f_service.data.meta.label')
       })
     })
-    return { interactions: interactions, totalCount: parseInt(data.meta.count) }
+    return interactions
   } else {
     return false
   }

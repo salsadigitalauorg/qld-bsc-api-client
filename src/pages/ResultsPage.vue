@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import api from '../libs/api'
+import dataservice from '../libs/dataservice'
 import criteria from '../libs/criteria'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
@@ -77,7 +77,7 @@ export default {
     async loadDataset () {
       const filter = this.getAPIFilter()
       const page = this.getAPIPage()
-      const result = await api.loadGroupedServiceInteractions({ filter, page })
+      const result = await dataservice.getGroupedServiceInteractions({ filter, page })
       return result
     },
     async load () {
