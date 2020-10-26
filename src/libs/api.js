@@ -1,7 +1,7 @@
 const { queryAPI, queryAPIAll } = require('./utils')
 const parse = require('./mapping')
 
-const domain = 'https://nginx-php-qld-bsc-master.au.amazee.io/'
+const domain = 'https://nginx-php-qld-bsc-develop.au.amazee.io/'
 const auth = { username: 'bsc', password: 'bsc2020' }
 
 /**
@@ -23,7 +23,7 @@ async function loadCriteria () {
  */
 async function loadServices (options) {
   const data = await queryAPI({
-    endpoint: `${domain}api/v1/taxonomy_term/agencies`, // TODO - Swap to: api/v1/taxonomy_term/service
+    endpoint: `${domain}api/v1/taxonomy_term/services`,
     endpointAuth: auth,
     filter: options.filter
   })
@@ -31,7 +31,7 @@ async function loadServices (options) {
 }
 
 /**
- *
+ * Loads a list of service interactions.
  * @param {Object} options Filters and pages { filter: {}, page: { limit, offset } }
  */
 async function loadServiceInteractions (options) {
@@ -41,12 +41,41 @@ async function loadServiceInteractions (options) {
     include: [],
     filter: options.filter,
     sort: [
-      'f_service.title',
+      'f_service.name',
       'title'
     ],
     page: options.page
   })
   return parse.serviceInteraction(data)
+}
+
+/**
+ * Loads grouped services.
+ */
+async function loadGroupedServiceInteractions (options) {
+  const interactionsResult = await loadServiceInteractions(options)
+  // 1) Get unique service ids
+  const serviceIds = new Set()
+  interactionsResult.interactions.forEach(interaction => serviceIds.add(interaction.service_id))
+  // 2) Query API for service taxonomy terms
+  const serviceResults = await loadServices({
+    filter: {
+      group_tid: { condition: { path: 'tid', value: Array.from(serviceIds), operator: 'IN' } }
+    }
+  })
+  // 3) Create array of services
+  const services = {}
+  serviceResults.forEach(service => {
+    service.interactions = []
+    services[service.tid] = service
+  })
+  // 4) Map interactions with their service
+  interactionsResult.interactions.forEach(interaction => services[interaction.service_id].interactions.push(interaction))
+  const groupedServices = Object.keys(services).map(key => services[key])
+  return {
+    services: groupedServices,
+    totalCount: interactionsResult.totalCount
+  }
 }
 
 /**
@@ -71,5 +100,6 @@ module.exports = {
   loadCriteria,
   loadServices,
   loadServiceInteractions,
+  loadGroupedServiceInteractions,
   loadFullServiceInteraction
 }

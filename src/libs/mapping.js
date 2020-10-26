@@ -1,3 +1,18 @@
+function getObjectProperty (object, name, fallback = null) {
+  const items = name.split('.')
+  let workingItem = object
+  for (let i = 0; i < items.length; i++) {
+    const prop = items[i]
+    if (workingItem[prop] !== undefined && workingItem[prop] !== null) {
+      workingItem = workingItem[prop]
+    } else {
+      workingItem = fallback
+      break
+    }
+  }
+  return workingItem
+}
+
 /**
  * Simplify result data fields for a full service.
  * @param {Array} data
@@ -10,36 +25,36 @@ function fullServiceInteraction (data) {
     const service = {
       type: type,
       id: attrs.drupal_internal__nid,
-      service_id: item.relationships.f_service ? item.relationships.f_service.data.meta.drupal_internal__nid : '',
       name: attrs.title,
-      agency_service_id: attrs.f_agency_service_id ? attrs.f_agency_service_id : '',
-      do_it_online_url: attrs.f_do_it_online_url ? attrs.f_do_it_online_url.uri : '',
-      fees: attrs.f_fees ? attrs.f_fees.processed : '',
-      form_url: attrs.f_form_url ? attrs.f_form_url.uri : '',
-      how_to: attrs.f_how_to ? attrs.f_how_to.processed : '',
-      in_person: attrs.f_in_person ? attrs.f_in_person : '',
-      keywords: attrs.f_keywords ? attrs.f_keywords : '',
-      long_description: attrs.f_long_description ? attrs.f_long_description.processed : '',
-      more_information_url: attrs.f_more_information_url ? attrs.f_more_information_url.uri : '',
-      old_qgs_id: attrs.f_old_qgs_id ? attrs.f_old_qgs_id : '',
-      old_sir_id: attrs.f_old_sir_id ? attrs.f_old_sir_id : '',
-      prerequisites: attrs.f_prerequisites ? attrs.f_prerequisites.processed : '',
-      business_unit_name: attrs.f_business_unit_name ? attrs.f_business_unit_name : '',
-      service_owner_name: attrs.f_service_owner_name ? attrs.f_service_owner_name : '',
-      service_owner_email: attrs.f_service_owner_email ? attrs.f_service_owner_email : '',
-      service_owner_status: attrs.f_service_owner_status ? attrs.f_service_owner_status : '',
-      service_date: attrs.f_service_date ? attrs.f_service_date.value : '',
-      service_date_end: attrs.f_service_date ? attrs.f_service_date.end_value : '',
-      service_status: attrs.f_service_status ? attrs.f_service_status : '',
-      service_type: attrs.f_service_type ? attrs.f_service_type : '',
-      service_validated_date: attrs.f_service_validated_date ? attrs.f_service_validated_date : '',
-      short_description: attrs.f_short_description ? attrs.f_short_description : '',
-      who_do_i_call: attrs.f_who_do_i_call ? attrs.f_who_do_i_call : '',
-      who_is_eligible: attrs.f_who_is_eligible ? attrs.f_who_is_eligible.processed : '',
-      message_applied: attrs.f_message_applied ? attrs.f_message_applied.processed : '',
-      message_problem: attrs.f_message_problem ? attrs.f_message_problem.processed : '',
-      message_progress: attrs.f_message_progress ? attrs.f_message_progress.processed : '',
-      message_provisioned: attrs.f_message_provisioned ? attrs.f_message_provisioned.processed : ''
+      service_id: getObjectProperty(item, 'relationships.f_service.data.meta.drupal_internal__nid', ''),
+      agency_service_id: getObjectProperty(attrs, 'f_agency_service_id', ''),
+      do_it_online_url: getObjectProperty(attrs, 'f_do_it_online_url.uri', ''),
+      fees: getObjectProperty(attrs, 'f_fees.processed', ''),
+      form_url: getObjectProperty(attrs, 'f_form_url.uri', ''),
+      how_to: getObjectProperty(attrs, 'f_how_to.processed', ''),
+      in_person: getObjectProperty(attrs, 'f_in_person', ''),
+      keywords: getObjectProperty(attrs, 'f_keywords', ''),
+      long_description: getObjectProperty(attrs, 'f_long_description.processed', ''),
+      more_information_url: getObjectProperty(attrs, 'f_more_information_url.uri', ''),
+      old_qgs_id: getObjectProperty(attrs, 'f_old_qgs_id', ''),
+      old_sir_id: getObjectProperty(attrs, 'f_old_sir_id', ''),
+      prerequisites: getObjectProperty(attrs, 'f_prerequisites.processed', ''),
+      business_unit_name: getObjectProperty(attrs, 'f_business_unit_name', ''),
+      service_owner_name: getObjectProperty(attrs, 'f_service_owner_name', ''),
+      service_owner_email: getObjectProperty(attrs, 'f_service_owner_email', ''),
+      service_owner_status: getObjectProperty(attrs, 'f_service_owner_status', ''),
+      service_date: getObjectProperty(attrs, 'f_service_date.value', ''),
+      service_date_end: getObjectProperty(attrs, 'f_service_date.end_value', ''),
+      service_status: getObjectProperty(attrs, 'f_service_status', ''),
+      service_type: getObjectProperty(attrs, 'f_service_type', ''),
+      service_validated_date: getObjectProperty(attrs, 'f_service_validated_date', ''),
+      short_description: getObjectProperty(attrs, 'f_short_description', ''),
+      who_do_i_call: getObjectProperty(attrs, 'f_who_do_i_call', ''),
+      who_is_eligible: getObjectProperty(attrs, 'f_who_is_eligible.processed', ''),
+      message_applied: getObjectProperty(attrs, 'f_message_applied.processed', ''),
+      message_problem: getObjectProperty(attrs, 'f_message_problem.processed', ''),
+      message_progress: getObjectProperty(attrs, 'f_message_progress.processed', ''),
+      message_provisioned: getObjectProperty(attrs, 'f_message_provisioned.processed', ''),
     }
     // Add agencies
     if (item.relationships.f_agency) {
@@ -55,10 +70,10 @@ function fullServiceInteraction (data) {
         }
       }
       if (agency) {
-        service['agency_name'] = agency.attributes.name || ''
-        service['agency_type'] = agency.attributes.f_agency_type || ''
-        service['agency_acronym'] = agency.attributes.f_agency_acronym ||  ''
-        service['agency_website_url'] = agency.attributes.f_agency_website_url.uri || ''
+        service['agency_name'] = getObjectProperty(agency, 'attributes.name', '')
+        service['agency_type'] = getObjectProperty(agency, 'attributes.f_agency_type', '')
+        service['agency_acronym'] = getObjectProperty(agency, 'attributes.f_agency_acronym', '')
+        service['agency_website_url'] = getObjectProperty(agency, 'attributes.f_agency_website_url.uri', '')
       }
     }
     return service
@@ -99,10 +114,10 @@ function service (data) {
     const services = []
     data.data.forEach(item => {
       services.push({
-        id: item.attributes.drupal_internal__tid, // TODO - Set as default interaction nid
         tid: item.attributes.drupal_internal__tid,
-        name: item.attributes.name,
-        description: item.attributes.f_agency_type, // TODO - Set as description
+        id: getObjectProperty(item, 'relationships.f_default_service_interaction.data.meta.drupal_internal__nid'),
+        name: getObjectProperty(item, 'relationships.f_default_service_interaction.data.meta.label'),
+        description: getObjectProperty(item, 'relationships.f_default_service_interaction.data.meta.f_short_description'),
       })
     })
     return services
@@ -122,12 +137,12 @@ function serviceInteraction (data) {
       interactions.push({
         id: item.attributes.drupal_internal__nid,
         name: item.attributes.title,
-        description: item.attributes.f_short_description ? item.attributes.f_short_description : '',
-        service_id: item.relationships.f_service.data.meta.drupal_internal__nid,
-        service_label: item.relationships.f_service.data.meta.label
+        description: getObjectProperty(item, 'attributes.f_short_description'),
+        service_id: getObjectProperty(item, 'relationships.f_service.data.meta.drupal_internal__tid'),
+        service_label: getObjectProperty(item, 'relationships.f_service.data.meta.label')
       })
     })
-    return interactions
+    return { interactions: interactions, totalCount: parseInt(data.meta.count) }
   } else {
     return false
   }

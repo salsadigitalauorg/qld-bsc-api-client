@@ -16,7 +16,6 @@
 <script>
 import api from '../libs/api'
 import criteria from '../libs/criteria'
-import serviceInteractions from '../libs/serviceInteractions'
 import Results from '../components/Results'
 import Pager from '../components/Pager'
 import Error from '../components/Error'
@@ -78,9 +77,8 @@ export default {
     async loadDataset () {
       const filter = this.getAPIFilter()
       const page = this.getAPIPage()
-      const result = await api.loadServiceInteractions({ filter, page })
-      const parsed = serviceInteractions.getServiceGroupsFromInteractions(result)
-      return parsed
+      const result = await api.loadGroupedServiceInteractions({ filter, page })
+      return result
     },
     async load () {
       try {

@@ -150,6 +150,7 @@ export default {
           this.state = 'no-results'
         }
       } catch (e) {
+        console.log(e)
         this.state = 'error'
       }
     },
