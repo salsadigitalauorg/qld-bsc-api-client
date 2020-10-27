@@ -21,7 +21,8 @@ async function loadServices (domain, options) {
   const data = await queryAPI({
     endpoint: `${domain.url}api/v1/taxonomy_term/services`,
     endpointAuth: domain.auth,
-    filter: options.filter
+    filter: options.filter,
+    sort: [ 'name' ]
   })
   return data
 }

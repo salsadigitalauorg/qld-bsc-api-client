@@ -27,7 +27,7 @@ async function getGroupedServiceInteractions (domain, options) {
   })
   // 4) Map interactions with their service
   interactionsResults.forEach(interaction => services[interaction.service_id].interactions.push(interaction))
-  const groupedServices = Object.keys(services).map(key => services[key])
+  const groupedServices = Object.keys(services).map(key => services[key]).sort((a, b) => a.name.localeCompare(b.name))
   return {
     services: groupedServices,
     totalCount: parseInt(interactionsData.meta.count)
