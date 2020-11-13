@@ -1,6 +1,14 @@
 <template>
   <div ref="app">
-    <button @click="backToProfile" class="full-view__back">Back</button>
+    <div class="results-page-control-panel">
+      <button @click="backToProfile" class="full-view__back">Back</button>
+      <div class="control-field">
+        <label for="items-per-page-select">Items per page</label>
+        <select id="items-per-page-select" class="control-field__select" v-model="itemsPerPageControl.input" @change="updateItemsPerPage">
+          <option v-for="(pageCount, key) in itemsPerPageControl.values" :value="pageCount" :key="key">{{ pageCount }}</option>
+        </select>
+      </div>
+    </div>
     <loading v-if="state === 'loading'" />
     <template v-if="state === 'display'">
       <results :list="this.dataset.services" @selected="selectedResult"/>
@@ -38,7 +46,13 @@ export default {
         currentStep: 1,
         itemsPerStep: 10,
         totalCount: 1
-      }
+      },
+      itemsPerPageControl: {
+        default: 25,
+        input: null,
+        values: [10, 25, 50]
+      },
+      ignoreQueryKeys: ['page', 'dev', 'items']
     }
   },
   computed: {
@@ -55,7 +69,7 @@ export default {
       const query = this.$route.query
       const filter = {}
       Object.keys(query).forEach(key => {
-        if (key !== 'page' && key !== 'dev') {
+        if (this.ignoreQueryKeys.indexOf(key) === -1) {
           const val = query[key]
           if (val) {
             const field = criteria.getCriteriaFromQuery(key)
@@ -125,8 +139,18 @@ export default {
       }
       this.$router.push({ path: '/', query })
     },
+    updateItemsPerPage () {
+      let query = JSON.parse(JSON.stringify(this.$route.query))
+      delete query['items']
+      if (this.itemsPerPageControl.input != this.itemsPerPageControl.default) {
+        query['items'] = this.itemsPerPageControl.input
+      }
+      this.$router.push({ query })
+    },
     setState (query) {
       this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
+      this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
+      this.itemsPerPageControl.input = this.pager.itemsPerStep
       this.load()
     }
   },
@@ -140,3 +164,26 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  @import '../styles/variables';
+
+  .results-page-control-panel {
+    @include breakpoint('s') {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  .control-field {
+    margin: rem(16px) 0;
+
+    @include breakpoint('s') {
+      margin: 0;
+    }
+
+    &__select {
+      margin-left: rem(4px);
+    }
+  }
+</style>
