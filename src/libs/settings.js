@@ -1,11 +1,11 @@
 module.exports = {
   domain: {
     dev: {
-      url: 'https://nginx-php-qld-bsc-develop.au.amazee.io/',
+      url: 'https://nginx-php.master.qld-bsc.au2.amazee.io/',
       auth: { username: 'bsc', password: 'bsc2020' }
     },
     master: {
-      url: 'https://nginx-php-qld-bsc-master.au.amazee.io/',
+      url: 'https://nginx-php.master.qld-bsc.au2.amazee.io/',
       auth: { username: 'bsc', password: 'bsc2020' }
     }
   }
