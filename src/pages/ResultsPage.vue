@@ -5,6 +5,19 @@
       <div class="results-page-control-panel__right">
         <div class="control-field">
           <label for="items-per-page-view-as">View as</label>
+          <input type="checkbox" id="action" value="action" v-model="serviceAction" @change="updateServiceType">
+          <label for="action">Action</label>
+          <input type="checkbox" id="information" value="information" v-model="serviceInformation" @change="updateServiceType">
+          <label for="information">Information</label>
+          <input type="checkbox" id="grant" value="grant" v-model="serviceGrant" @change="updateServiceType">
+          <label for="grant">Grant</label>
+          <input type="checkbox" id="concession" value="concession" v-model="serviceConcession" @change="updateServiceType">
+          <label for="concession">Concession</label>
+          <input type="checkbox" id="loan" value="loan" v-model="serviceLoan" @change="updateServiceType">
+          <label for="loan">Loan</label>
+        </div>
+        <div class="control-field">
+          <label for="items-per-page-view-as">View as</label>
           <select id="items-per-page-view-as" class="control-field__select" v-model="viewMode" @change="updateView">
             <option value="accordion">Accordion</option>
             <option value="list">List</option>
@@ -64,9 +77,16 @@ export default {
         input: null,
         values: [10, 25, 50]
       },
-      ignoreQueryKeys: ['page', 'dev', 'items', 'view'],
+      ignoreQueryKeys: ['page', 'dev', 'items', 'view', 'service_type'],
       defaultViewMode: 'accordion',
-      viewMode: 'accordion'
+      viewMode: 'accordion',
+      serviceType: '',
+      serviceAction: '',
+      serviceInformation: '',
+      serviceGrant: '',
+      serviceConcession: '',
+      serviceLoan: '',
+      values: []
     }
   },
   computed: {
@@ -79,12 +99,14 @@ export default {
   },
   methods: {
     getAPIFilter () {
+      //TODO this is where the magic needs to happen
       // Profile criteria
       const query = this.$route.query
       const filter = {}
       Object.keys(query).forEach(key => {
         if (this.ignoreQueryKeys.indexOf(key) === -1) {
           const val = query[key]
+          console.log(key)
           if (val) {
             const field = criteria.getCriteriaFromQuery(key)
             if (Array.isArray(val)) {
@@ -94,6 +116,24 @@ export default {
               filter[field.filterName] = { value: val }
             }
           }
+        } else if (key === 'service_type' && query[key].length > 0) {
+            const values = []
+            if(this.serviceAction == true){
+              values.push('action')
+            }
+            if(this.serviceInformation == true){
+              values.push('information')
+            }
+            if(this.serviceGrant == true){
+              values.push('grant')
+            }
+            if(this.serviceConcession == true){
+              values.push('concession')
+            }
+            if(this.serviceLoan == true){
+              values.push('loan')
+            }
+            filter['f_service_type'] = { condition: { value: values, path: 'f_service_type', operator: 'IN' } }
         }
       })
       return filter
@@ -170,11 +210,40 @@ export default {
       }
       this.$router.push({ query })
     },
+
+    updateServiceType () {
+      let query = JSON.parse(JSON.stringify(this.$route.query))
+      delete query['service_type']
+      query['service_type'] = []
+      if (this.serviceAction == true) {
+        query['service_type'].push('action')
+      }
+      if (this.serviceInformation == true) {
+        query['service_type'].push('information')
+      }
+      if (this.serviceGrant == true) {
+        query['service_type'].push('grant')
+      }
+      if (this.serviceConcession == true) {
+        query['service_type'].push('concession')
+      }
+      if (this.serviceLoan == true) {
+        query['service_type'].push('loan')
+      }
+      console.log(query)
+      this.$router.push({ query })
+    },
+    //TODO new to set new view from dropdown box
     setState (query) {
       this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
       this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
       this.itemsPerPageControl.input = this.pager.itemsPerStep
       this.viewMode = (query.view) ? query.view : this.defaultViewMode
+      this.serviceAction = (query.service_type) && query.service_type.indexOf('action' >= 0)
+      this.serviceInformation = (query.service_type) && query.service_type.indexOf('information' >= 0)
+      this.serviceGrant = (query.service_type) && query.service_type.indexOf('grant' >= 0)
+      this.serviceConcession = (query.service_type) && query.service_type.indexOf('concession' >= 0)
+      this.serviceLoan = (query.service_type) && query.service_type.indexOf('loan' >= 0)
       this.load()
     }
   },
