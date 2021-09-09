@@ -239,11 +239,11 @@ export default {
       this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
       this.itemsPerPageControl.input = this.pager.itemsPerStep
       this.viewMode = (query.view) ? query.view : this.defaultViewMode
-      this.serviceAction = (query.service_type) && query.service_type.indexOf('action' >= 0)
-      this.serviceInformation = (query.service_type) && query.service_type.indexOf('information' >= 0)
-      this.serviceGrant = (query.service_type) && query.service_type.indexOf('grant' >= 0)
-      this.serviceConcession = (query.service_type) && query.service_type.indexOf('concession' >= 0)
-      this.serviceLoan = (query.service_type) && query.service_type.indexOf('loan' >= 0)
+      this.serviceAction = (query.service_type) && query.service_type.indexOf('action') >= 0
+      this.serviceInformation = (query.service_type) && query.service_type.indexOf('information') >= 0
+      this.serviceGrant = (query.service_type) && query.service_type.indexOf('grant') >= 0
+      this.serviceConcession = (query.service_type) && query.service_type.indexOf('concession') >= 0
+      this.serviceLoan = (query.service_type) && query.service_type.indexOf('loan') >= 0
       this.load()
     }
   },
