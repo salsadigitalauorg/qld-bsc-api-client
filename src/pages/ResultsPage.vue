@@ -4,17 +4,33 @@
       <button @click="backToProfile" class="full-view__back">Back</button>
       <div class="results-page-control-panel__right">
         <div class="control-field">
-          <label for="items-per-page-view-as">View as</label>
-          <input type="checkbox" id="action" value="action" v-model="serviceAction" @change="updateServiceType">
-          <label for="action">Action</label>
-          <input type="checkbox" id="information" value="information" v-model="serviceInformation" @change="updateServiceType">
-          <label for="information">Information</label>
-          <input type="checkbox" id="grant" value="grant" v-model="serviceGrant" @change="updateServiceType">
-          <label for="grant">Grant</label>
-          <input type="checkbox" id="concession" value="concession" v-model="serviceConcession" @change="updateServiceType">
-          <label for="concession">Concession</label>
-          <input type="checkbox" id="loan" value="loan" v-model="serviceLoan" @change="updateServiceType">
-          <label for="loan">Loan</label>
+          <div class="dropdown">
+            <button class="dropdown__toggle" @click="toggleMenu" :aria-expanded="isShowing ? 'true': 'false'">View as</button>
+            <div v-if="isShowing" class="dropdown__panel">
+              <ul class="dropdown__list">
+                <li class="dropdown__list-item">
+                  <input type="checkbox" id="action" value="action" v-model="serviceAction" @change="updateServiceType">
+                  <label for="action">Action</label>
+                </li>
+                <li class="dropdown__list-item">
+                  <input type="checkbox" id="information" value="information" v-model="serviceInformation" @change="updateServiceType">
+                  <label for="information">Information</label>
+                </li>
+                <li class="dropdown__list-item">
+                  <input type="checkbox" id="grant" value="grant" v-model="serviceGrant" @change="updateServiceType">
+                  <label for="grant">Grant</label>
+                </li>
+                <li class="dropdown__list-item">
+                  <input type="checkbox" id="concession" value="concession" v-model="serviceConcession" @change="updateServiceType">
+                  <label for="concession">Concession</label>
+                </li>
+                <li class="dropdown__list-item">
+                  <input type="checkbox" id="loan" value="loan" v-model="serviceLoan" @change="updateServiceType">
+                  <label for="loan">Loan</label>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
         <div class="control-field">
           <label for="items-per-page-view-as">View as</label>
@@ -86,7 +102,8 @@ export default {
       serviceGrant: '',
       serviceConcession: '',
       serviceLoan: '',
-      values: []
+      values: [],
+      isShowing: false
     }
   },
   computed: {
@@ -210,7 +227,22 @@ export default {
       }
       this.$router.push({ query })
     },
-
+    windowClick (e) {
+      const parent = e.target.closest('.my-dropdown')
+      if (parent === null) {
+        this.isShowing = false
+      }
+    },
+    toggleMenu () {
+      this.isShowing = !this.isShowing
+      console.log(this.isShowing)
+      if (this.isShowing) {
+        window.addEventListener('click', this.windowClick)
+      }
+    },
+    updateDropdown () {
+      console.log("Updated!")
+    },
     updateServiceType () {
       let query = JSON.parse(JSON.stringify(this.$route.query))
       delete query['service_type']
@@ -233,7 +265,7 @@ export default {
       console.log(query)
       this.$router.push({ query })
     },
-    //TODO new to set new view from dropdown box
+
     setState (query) {
       this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
       this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
@@ -249,6 +281,9 @@ export default {
   },
   created () {
     this.setState(this.$route.query)
+  },
+  destroyed () {
+    window.removeEventListener('click', this.windowClick)
   },
   watch: {
     $route: function (to) {
@@ -284,6 +319,22 @@ export default {
 
     &__select {
       margin-left: rem(4px);
+    }
+  }
+
+  .dropdown {
+    position: relative;
+    &__panel{
+      box-shadow: 0 0 2px black;
+      background: white;
+      position: absolute;
+      }
+    &__list{
+      list-style-type: none;
+      padding: 0px;
+    }
+    &__list-item{
+      display: flex;
     }
   }
 </style>
