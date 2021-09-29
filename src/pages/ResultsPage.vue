@@ -5,7 +5,9 @@
       <div class="results-page-control-panel__right">
         <div class="control-field">
           <div class="dropdown">
-            <button class="dropdown__toggle" @click="toggleMenu" :aria-expanded="isShowing ? 'true': 'false'">View as</button>
+            <button class="dropdown__toggle" @click="toggleMenu" :aria-expanded="isShowing ? 'true': 'false'">
+              Filter By Type
+              </button>
             <div v-if="isShowing" class="dropdown__panel">
               <ul class="dropdown__list">
                 <li class="dropdown__list-item">
@@ -228,7 +230,7 @@ export default {
       this.$router.push({ query })
     },
     windowClick (e) {
-      const parent = e.target.closest('.my-dropdown')
+      const parent = e.target.closest('.dropdown')
       if (parent === null) {
         this.isShowing = false
       }
@@ -328,13 +330,19 @@ export default {
       box-shadow: 0 0 2px black;
       background: white;
       position: absolute;
-      }
+      padding: 8px;
+    }
     &__list{
       list-style-type: none;
-      padding: 0px;
+      padding: 0;
+      margin: 0;
     }
     &__list-item{
       display: flex;
+      margin-bottom: 4px;
+      &:last-child{
+        margin-bottom: 0;
+      }
     }
   }
 </style>
