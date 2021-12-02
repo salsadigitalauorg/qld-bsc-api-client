@@ -7,12 +7,12 @@
           <div class="dropdown">
             <button class="dropdown__toggle" @click="toggleMenu" :aria-expanded="isShowing ? 'true': 'false'">
               Filter By Type
-              </button>
+            </button>
             <div v-if="isShowing" class="dropdown__panel">
               <ul class="dropdown__list">
                 <li class="dropdown__list-item" v-for="(type, index) in serviceTypes" :key="index">
                   <input type="checkbox" :id="type.id" v-model="type.selected" @change="updateServiceType">
-                  <label :for="type.id">{{type.label}}</label>
+                  <label :for="type.id">{{ type.label }}</label>
                 </li>
               </ul>
             </div>
@@ -103,14 +103,12 @@ export default {
   },
   methods: {
     getAPIFilter () {
-      //TODO this is where the magic needs to happen
       // Profile criteria
       const query = this.$route.query
       const filter = {}
       Object.keys(query).forEach(key => {
         if (this.ignoreQueryKeys.indexOf(key) === -1) {
           const val = query[key]
-          console.log(key)
           if (val) {
             const field = criteria.getCriteriaFromQuery(key)
             if (Array.isArray(val)) {
@@ -123,7 +121,7 @@ export default {
         } else if (key === 'service_type' && query[key].length > 0) {
             const values = []
             this.serviceTypes.forEach(type => {
-              if(type.selected == true){
+              if (type.selected == true){
                 values.push(type.id)
               }
             })
@@ -158,7 +156,6 @@ export default {
           this.state = 'no-results'
         }
       } catch (e) {
-        console.log(e)
         this.state = 'error'
       }
     },
@@ -212,24 +209,19 @@ export default {
     },
     toggleMenu () {
       this.isShowing = !this.isShowing
-      console.log(this.isShowing)
       if (this.isShowing) {
         window.addEventListener('click', this.windowClick)
       }
-    },
-    updateDropdown () {
-      console.log("Updated!")
     },
     updateServiceType () {
       let query = JSON.parse(JSON.stringify(this.$route.query))
       delete query['service_type']
       query['service_type'] = []
       this.serviceTypes.forEach(type => {
-        if(type.selected){
+        if (type.selected){
           query['service_type'].push(type.id)
         }
       })
-      console.log(query)
       this.$router.push({ query })
     },
 
@@ -241,14 +233,8 @@ export default {
       this.serviceTypes.forEach(type => {
         type.selected = false
       })
-      if (query.service_type){  
-        let query_service_types = []
-        if (typeof query.service_type === 'string') {
-          query_service_types.push(query.service_type)
-        }
-        else {
-          query_service_types = query.service_type
-        }
+      if (query.service_type) {  
+        const query_service_types = (typeof query.service_type === 'string') ? [query.service_type] : query.service_type
         query_service_types.forEach(type => {
           const idx = this.serviceTypes.find(t => t.id === type)
           idx.selected = true
@@ -302,23 +288,24 @@ export default {
 
   .dropdown {
     position: relative;
-    &__panel{
-      box-shadow: 0 0 2px black;
+    &__panel {
+      box-shadow: 0 0 rem(2px) black;
       background: white;
       position: absolute;
-      padding: 8px;
+      padding: rem(8px);
     }
-    &__list{
+    &__list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
-    &__list-item{
+    &__list-item {
       display: flex;
-      margin-bottom: 4px;
-      &:last-child{
+      margin-bottom: rem(4px);
+      &:last-child {
         margin-bottom: 0;
       }
     }
   }
+  
 </style>

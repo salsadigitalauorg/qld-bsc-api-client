@@ -133,7 +133,6 @@ export default {
           query['dev'] = 'true'
         }
         this.$router.push({ name: 'results', query })
-        console.log(query)
       }
     }
   },
