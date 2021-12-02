@@ -4,6 +4,21 @@
       <button @click="backToProfile" class="full-view__back">Back</button>
       <div class="results-page-control-panel__right">
         <div class="control-field">
+          <div class="dropdown">
+            <button class="dropdown__toggle" @click="toggleMenu" :aria-expanded="isShowing ? 'true': 'false'">
+              Filter By Type
+            </button>
+            <div v-if="isShowing" class="dropdown__panel">
+              <ul class="dropdown__list">
+                <li class="dropdown__list-item" v-for="(type, index) in serviceTypes" :key="index">
+                  <input type="checkbox" :id="type.id" v-model="type.selected" @change="updateServiceType">
+                  <label :for="type.id">{{ type.label }}</label>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="control-field">
           <label for="items-per-page-view-as">View as</label>
           <select id="items-per-page-view-as" class="control-field__select" v-model="viewMode" @change="updateView">
             <option value="accordion">Accordion</option>
@@ -64,9 +79,18 @@ export default {
         input: null,
         values: [10, 25, 50]
       },
-      ignoreQueryKeys: ['page', 'dev', 'items', 'view'],
+      ignoreQueryKeys: ['page', 'dev', 'items', 'view', 'service_type'],
       defaultViewMode: 'accordion',
-      viewMode: 'accordion'
+      viewMode: 'accordion',
+      serviceTypes: [
+        { id: 'action', label: 'Action', selected: false },
+        { id: 'information', label: 'Information', selected: false },
+        { id: 'concession', label: 'Concession', selected: false },
+        { id: 'grant', label: 'Grant', selected: false },
+        { id: 'loan', label: 'Loan', selected: false }
+      ],
+      values: [],
+      isShowing: false
     }
   },
   computed: {
@@ -94,6 +118,14 @@ export default {
               filter[field.filterName] = { value: val }
             }
           }
+        } else if (key === 'service_type' && query[key].length > 0) {
+            const values = []
+            this.serviceTypes.forEach(type => {
+              if (type.selected == true){
+                values.push(type.id)
+              }
+            })
+            filter['f_service_type'] = { condition: { value: values, path: 'f_service_type', operator: 'IN' } }
         }
       })
       return filter
@@ -124,7 +156,6 @@ export default {
           this.state = 'no-results'
         }
       } catch (e) {
-        console.log(e)
         this.state = 'error'
       }
     },
@@ -170,16 +201,53 @@ export default {
       }
       this.$router.push({ query })
     },
+    windowClick (e) {
+      const parent = e.target.closest('.dropdown')
+      if (parent === null) {
+        this.isShowing = false
+      }
+    },
+    toggleMenu () {
+      this.isShowing = !this.isShowing
+      if (this.isShowing) {
+        window.addEventListener('click', this.windowClick)
+      }
+    },
+    updateServiceType () {
+      let query = JSON.parse(JSON.stringify(this.$route.query))
+      delete query['service_type']
+      query['service_type'] = []
+      this.serviceTypes.forEach(type => {
+        if (type.selected){
+          query['service_type'].push(type.id)
+        }
+      })
+      this.$router.push({ query })
+    },
+
     setState (query) {
       this.pager.currentStep = (query.page) ? parseInt(query.page, 10) : 1
       this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
       this.itemsPerPageControl.input = this.pager.itemsPerStep
       this.viewMode = (query.view) ? query.view : this.defaultViewMode
+      this.serviceTypes.forEach(type => {
+        type.selected = false
+      })
+      if (query.service_type) {  
+        const query_service_types = (typeof query.service_type === 'string') ? [query.service_type] : query.service_type
+        query_service_types.forEach(type => {
+          const idx = this.serviceTypes.find(t => t.id === type)
+          idx.selected = true
+        })
+      }
       this.load()
     }
   },
   created () {
     this.setState(this.$route.query)
+  },
+  destroyed () {
+    window.removeEventListener('click', this.windowClick)
   },
   watch: {
     $route: function (to) {
@@ -217,4 +285,27 @@ export default {
       margin-left: rem(4px);
     }
   }
+
+  .dropdown {
+    position: relative;
+    &__panel {
+      box-shadow: 0 0 rem(2px) black;
+      background: white;
+      position: absolute;
+      padding: rem(8px);
+    }
+    &__list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    &__list-item {
+      display: flex;
+      margin-bottom: rem(4px);
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
 </style>
