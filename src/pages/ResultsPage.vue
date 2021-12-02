@@ -10,25 +10,9 @@
               </button>
             <div v-if="isShowing" class="dropdown__panel">
               <ul class="dropdown__list">
-                <li class="dropdown__list-item">
-                  <input type="checkbox" id="action" value="action" v-model="serviceAction" @change="updateServiceType">
-                  <label for="action">Action</label>
-                </li>
-                <li class="dropdown__list-item">
-                  <input type="checkbox" id="information" value="information" v-model="serviceInformation" @change="updateServiceType">
-                  <label for="information">Information</label>
-                </li>
-                <li class="dropdown__list-item">
-                  <input type="checkbox" id="grant" value="grant" v-model="serviceGrant" @change="updateServiceType">
-                  <label for="grant">Grant</label>
-                </li>
-                <li class="dropdown__list-item">
-                  <input type="checkbox" id="concession" value="concession" v-model="serviceConcession" @change="updateServiceType">
-                  <label for="concession">Concession</label>
-                </li>
-                <li class="dropdown__list-item">
-                  <input type="checkbox" id="loan" value="loan" v-model="serviceLoan" @change="updateServiceType">
-                  <label for="loan">Loan</label>
+                <li class="dropdown__list-item" v-for="(type, index) in serviceTypes" :key="index">
+                  <input type="checkbox" :id="type.id" v-model="type.selected" @change="updateServiceType">
+                  <label :for="type.id">{{type.label}}</label>
                 </li>
               </ul>
             </div>
@@ -98,12 +82,13 @@ export default {
       ignoreQueryKeys: ['page', 'dev', 'items', 'view', 'service_type'],
       defaultViewMode: 'accordion',
       viewMode: 'accordion',
-      serviceType: '',
-      serviceAction: '',
-      serviceInformation: '',
-      serviceGrant: '',
-      serviceConcession: '',
-      serviceLoan: '',
+      serviceTypes: [
+        { id: 'action', label: 'Action', selected: false },
+        { id: 'information', label: 'Information', selected: false },
+        { id: 'concession', label: 'Concession', selected: false },
+        { id: 'grant', label: 'Grant', selected: false },
+        { id: 'loan', label: 'Loan', selected: false }
+      ],
       values: [],
       isShowing: false
     }
@@ -137,21 +122,11 @@ export default {
           }
         } else if (key === 'service_type' && query[key].length > 0) {
             const values = []
-            if(this.serviceAction == true){
-              values.push('action')
-            }
-            if(this.serviceInformation == true){
-              values.push('information')
-            }
-            if(this.serviceGrant == true){
-              values.push('grant')
-            }
-            if(this.serviceConcession == true){
-              values.push('concession')
-            }
-            if(this.serviceLoan == true){
-              values.push('loan')
-            }
+            this.serviceTypes.forEach(type => {
+              if(type.selected == true){
+                values.push(type.id)
+              }
+            })
             filter['f_service_type'] = { condition: { value: values, path: 'f_service_type', operator: 'IN' } }
         }
       })
@@ -249,21 +224,11 @@ export default {
       let query = JSON.parse(JSON.stringify(this.$route.query))
       delete query['service_type']
       query['service_type'] = []
-      if (this.serviceAction == true) {
-        query['service_type'].push('action')
-      }
-      if (this.serviceInformation == true) {
-        query['service_type'].push('information')
-      }
-      if (this.serviceGrant == true) {
-        query['service_type'].push('grant')
-      }
-      if (this.serviceConcession == true) {
-        query['service_type'].push('concession')
-      }
-      if (this.serviceLoan == true) {
-        query['service_type'].push('loan')
-      }
+      this.serviceTypes.forEach(type => {
+        if(type.selected){
+          query['service_type'].push(type.id)
+        }
+      })
       console.log(query)
       this.$router.push({ query })
     },
@@ -273,11 +238,22 @@ export default {
       this.pager.itemsPerStep = (query.items) ? parseInt(query.items, 10) : this.itemsPerPageControl.default
       this.itemsPerPageControl.input = this.pager.itemsPerStep
       this.viewMode = (query.view) ? query.view : this.defaultViewMode
-      this.serviceAction = (query.service_type) && query.service_type.indexOf('action') >= 0
-      this.serviceInformation = (query.service_type) && query.service_type.indexOf('information') >= 0
-      this.serviceGrant = (query.service_type) && query.service_type.indexOf('grant') >= 0
-      this.serviceConcession = (query.service_type) && query.service_type.indexOf('concession') >= 0
-      this.serviceLoan = (query.service_type) && query.service_type.indexOf('loan') >= 0
+      this.serviceTypes.forEach(type => {
+        type.selected = false
+      })
+      if (query.service_type){  
+        let query_service_types = []
+        if (typeof query.service_type === 'string') {
+          query_service_types.push(query.service_type)
+        }
+        else {
+          query_service_types = query.service_type
+        }
+        query_service_types.forEach(type => {
+          const idx = this.serviceTypes.find(t => t.id === type)
+          idx.selected = true
+        })
+      }
       this.load()
     }
   },
