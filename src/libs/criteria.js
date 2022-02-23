@@ -20,10 +20,15 @@ const criteriaFields = {
     queryName: 'sector',
     filterName: 'f_c_business_sector'
   },
-  criteria_card_licences_permits: {
-    label: 'Card, licenses and permits',
+  criteria_card: {
+    label: 'Card',
     queryName: 'permits',
-    filterName: 'f_c_card_licences_permits'
+    filterName: 'f_c_card'
+  },
+  criteria_licences_permits: {
+    label: 'Licenses and permits',
+    queryName: 'permits',
+    filterName: 'f_c_licences_permits'
   },
   criteria_housing: {
     label: 'Housing',
