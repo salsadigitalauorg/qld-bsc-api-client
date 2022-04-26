@@ -21,7 +21,7 @@ const criteriaFields = {
     filterName: 'f_c_business_sector'
   },
   criteria_card: {
-    label: 'Card',
+    label: 'Cards',
     queryName: 'permits',
     filterName: 'f_c_card'
   },
