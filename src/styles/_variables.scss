@@ -1,9 +1,11 @@
+@use 'sass:math';
+
 // Font size
 $font-size-base-px: 16px;
 
 @function rem($pxval) {
   $base: $font-size-base-px;
-  @return ($pxval / $base) * 1rem;
+  @return math.div($pxval, $base) * 1rem;
 }
 
 // Colours
