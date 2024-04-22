@@ -48,8 +48,8 @@
 
 <script>
 import dataservice from '../libs/dataservice'
-import settings from '../libs/settings'
 import criteria from '../libs/criteria'
+import { getDomainQueryParams, getDomainSettings } from '../libs/domain'
 
 export default {
   name: 'ProfilePage',
@@ -76,15 +76,10 @@ export default {
       form: []
     }
   },
-  computed: {
-    isDev () {
-      return (this.$route.query.dev && this.$route.query.dev === 'true')
-    }
-  },
   methods: {
     async load () {
       try {
-        const domain = this.isDev ? settings.domain.dev : settings.domain.master
+        const domain = getDomainSettings(this.$route.query)
         const results = await dataservice.getCriteria(domain)
         Object.keys(results).forEach(key => {
           const criteria = results[key]
@@ -122,16 +117,13 @@ export default {
     },
     submit () {
       if (this.profile.length > 0) {
-        const query = {}
+        const query = {...getDomainQueryParams(this.$route.query)}
         this.form.forEach(field => {
           const anyId = this.getAnyId(field.options)
           if (field.value !== anyId) {
             query[field.name] = [anyId, field.value]
           }
         })
-        if (this.isDev) {
-          query['dev'] = 'true'
-        }
         this.$router.push({ name: 'results', query })
       }
     }

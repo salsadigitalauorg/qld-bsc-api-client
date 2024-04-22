@@ -48,8 +48,8 @@
 
 <script>
 import dataservice from '../libs/dataservice'
-import settings from '../libs/settings'
 import criteria from '../libs/criteria'
+import { getDomainSettings, getDomainQueryParams, getDomainParamNames } from '../libs/domain'
 import Results from '../components/Results'
 import ResultsList from '../components/ResultsList'
 import Pager from '../components/Pager'
@@ -79,7 +79,7 @@ export default {
         input: null,
         values: [10, 25, 50]
       },
-      ignoreQueryKeys: ['page', 'dev', 'items', 'view', 'service_type'],
+      ignoreQueryKeys: ['page', 'items', 'view', 'service_type', ...getDomainParamNames],
       defaultViewMode: 'accordion',
       viewMode: 'accordion',
       serviceTypes: [
@@ -96,9 +96,6 @@ export default {
   computed: {
     totalSteps () {
       return Math.ceil(this.dataset.totalCount / this.pager.itemsPerStep)
-    },
-    isDev () {
-      return (this.$route.query.dev && this.$route.query.dev === 'true')
     }
   },
   methods: {
@@ -141,7 +138,7 @@ export default {
     async loadDataset () {
       const filter = this.getAPIFilter()
       const page = this.getAPIPage()
-      const domain = this.isDev ? settings.domain.dev : settings.domain.master
+      const domain = getDomainSettings(this.$route.query)
       const result = await dataservice.getGroupedServiceInteractions(domain, { filter, page })
       return result
     },
@@ -171,17 +168,11 @@ export default {
       })
     },
     selectedResult (result) {
-      const query = {}
-      if (this.isDev) {
-        query['dev'] = 'true'
-      }
+      const query = {...getDomainQueryParams(this.$route.query)}
       this.$router.push({ name: 'service', params: { id: result.id }, query })
     },
     backToProfile () {
-      const query = {}
-      if (this.isDev) {
-        query['dev'] = 'true'
-      }
+      const query = {...getDomainQueryParams(this.$route.query)}
       this.$router.push({ path: '/', query })
     },
     updateItemsPerPage () {
@@ -233,7 +224,7 @@ export default {
       this.serviceTypes.forEach(type => {
         type.selected = false
       })
-      if (query.service_type) {  
+      if (query.service_type) {
         const query_service_types = (typeof query.service_type === 'string') ? [query.service_type] : query.service_type
         query_service_types.forEach(type => {
           const idx = this.serviceTypes.find(t => t.id === type)
@@ -307,5 +298,4 @@ export default {
       }
     }
   }
-  
 </style>
