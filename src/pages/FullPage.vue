@@ -167,6 +167,7 @@ export default {
 </script>
 
 <style lang="scss">
+@use 'sass:math';
 @import '../styles/variables';
 
 .full-view {
@@ -186,7 +187,7 @@ export default {
     padding-right: rem(22px);
 
     @include breakpoint('m') {
-      width: 8/12 * 100%;
+      width: math.div(8, 12) * 100%;
     }
 
     a {
@@ -198,7 +199,7 @@ export default {
     width: 100%;
 
     @include breakpoint('m') {
-      width: 4/12 * 100%;
+      width: math.div(4, 12) * 100%;
     }
   }
 
