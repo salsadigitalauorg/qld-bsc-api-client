@@ -21,12 +21,33 @@ async function getGroupedServiceInteractions (domain, options) {
   const serviceResults = parse.service(serviceData)
   // 3) Create array of services
   const services = {}
-  serviceResults.forEach(service => {
-    service.interactions = []
-    services[service.tid] = service
-  })
+  if (serviceResults) {
+    serviceResults.forEach(service => {
+      service.interactions = []
+      services[service.tid] = service
+    })
+  }
   // 4) Map interactions with their service
-  interactionsResults.forEach(interaction => services[interaction.service_id].interactions.push(interaction))
+  interactionsResults.forEach(interaction => {
+    if (!services[interaction.service_id]) {
+      console.log(`Error: Was unable to find a service group for tid ${interaction.service_id}. Creating fallback.`)
+      // If a service can't be found, but a label exists on the interaction
+      // create a fallback group. Fallback id is null to indicate no link required.
+      services[interaction.service_id] = {
+        id: null,
+        interactions: [],
+        name: interaction.service_label,
+        tid: null,
+      }
+    }
+    else if (!services[interaction.service_id].name) {
+      // Service was returned with no name. This will apply the service name
+      // stored on the interaction to avoid an unnamed service.
+      console.log(`Error: Setting service ${interaction.service_id} name to ${interaction.service_label}`)
+      services[interaction.service_id].name = interaction.service_label
+    }
+    services[interaction.service_id].interactions.push(interaction)
+  })
   const groupedServices = Object.keys(services).map(key => services[key]).sort((a, b) => a.name.localeCompare(b.name))
   return {
     services: groupedServices,

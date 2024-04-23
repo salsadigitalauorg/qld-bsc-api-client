@@ -153,6 +153,7 @@ export default {
           this.state = 'no-results'
         }
       } catch (e) {
+        console.log(e)
         this.state = 'error'
       }
     },
@@ -207,9 +208,10 @@ export default {
     updateServiceType () {
       let query = JSON.parse(JSON.stringify(this.$route.query))
       delete query['service_type']
+      delete query['page']
       query['service_type'] = []
       this.serviceTypes.forEach(type => {
-        if (type.selected){
+        if (type.selected) {
           query['service_type'].push(type.id)
         }
       })

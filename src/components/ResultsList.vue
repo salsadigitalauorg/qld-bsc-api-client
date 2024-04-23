@@ -21,7 +21,12 @@
             <span>{{ interactionGroup.interaction.description }}</span>
           </td>
           <td class="result__cell">
-            <button @click="selected(interactionGroup.service)" class="btn btn--small">{{ interactionGroup.service.name }}</button>
+            <button
+              v-if="interactionGroup.service.id"
+              @click="selected(interactionGroup.service)"
+              class="btn btn--small"
+            >{{ interactionGroup.service.name }}</button>
+            <div v-else>{{ interactionGroup.service.name }}</div>
           </td>
         </tr>
       </tbody>

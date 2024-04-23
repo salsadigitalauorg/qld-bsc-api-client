@@ -17,7 +17,8 @@
             <h4>Service</h4>
             <div class="result__service">
               <p>{{ item.description }}</p>
-              <button @click="selected(item)" class="btn btn--small">Read more about {{ item.name.toLowerCase() }}</button>
+              <button v-if="item.id" @click="selected(item)" class="btn btn--small">Read more about {{ item.name.toLowerCase() }}</button>
+              <div v-else>{{ item.name }}</div>
             </div>
           </template>
           <h4>Service interactions</h4>
