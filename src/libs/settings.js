@@ -1,8 +1,20 @@
+/*
+Used in ~/src/libs/domain.js.
+Domain production url and auth (optional).
+
+{
+  domain: {
+    production: {
+      url: 'https://url.com/',
+      auth: { username: 'my_username', password: 'my_password' }
+    }
+  }
+}
+*/
 module.exports = {
   domain: {
-    master: {
-      url: 'https://nginx-php.master.qld-bsc.au2.amazee.io/',
-      auth: { username: 'bsc', password: 'bsc2020' }
+    production: {
+      url: 'https://nginx-php.production.qld-bsc.lagoon.salsa.hosting/'
     }
   }
 }

@@ -2,19 +2,18 @@ import settings from './settings'
 
 export function getDomainSettings(routeQuery) {
   let domain = {}
-
-  if (routeQuery.api && routeQuery.auth) {
-    const auth = routeQuery.auth.split(':')
-    domain = {
-      url: routeQuery.api,
-      auth: {
+  if (routeQuery.api) {
+    domain['url'] = routeQuery.api
+    if (routeQuery.auth) {
+      const auth = routeQuery.auth.split(':')
+      domain['auth'] = {
         username: auth[0],
         password: auth[1]
       }
     }
   }
   else {
-    domain = settings.domain.master
+    domain = settings.domain.production
   }
   return domain
 }
