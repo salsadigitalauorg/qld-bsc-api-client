@@ -14,7 +14,7 @@ Domain production url and auth (optional).
 module.exports = {
   domain: {
     production: {
-      url: 'https://nginx-php.production.qld-bsc.lagoon.salsa.hosting/'
+      url: 'https://api.gsc.qld.gov.au/'
     }
   }
 }
